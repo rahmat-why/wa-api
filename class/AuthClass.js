@@ -87,9 +87,9 @@ const auth_class = class AuthClass {
         var verify_token = this.verifyToken(token)
         
         var new_user = {
-            id: verify_token.id,
-            name: verify_token.name,
-            telp: verify_token.telp,
+            id: user.id,
+            name: user.name,
+            telp: user.telp,
             token: token
         }
 
