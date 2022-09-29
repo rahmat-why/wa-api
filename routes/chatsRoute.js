@@ -13,7 +13,6 @@ router.get('/:jid', query('id').notEmpty(), requestValidator, sessionValidator, 
 
 router.post(
     '/send',
-    query('id').notEmpty(),
     body('receiver').notEmpty(),
     body('message').notEmpty(),
     requestValidator,

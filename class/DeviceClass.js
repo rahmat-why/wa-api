@@ -3,6 +3,10 @@ import {
 } from './../models/ApiModel.js'
 import { URL, parse } from 'url';
 import request from 'request';
+import date from 'date-and-time';
+import { LocalStorage } from "node-localstorage";
+const localStorage = new LocalStorage('./scratch');
+const user = localStorage.getItem("user")
 
 const device_class = class DeviceClass {
     constructor() {
@@ -35,10 +39,15 @@ const device_class = class DeviceClass {
         return this
     }
 
+    setApiKey(api_key) {
+        this.api_key = api_key
+        return this
+    }
+
     async showDevice() {
         const device = await Device.findAll({
             where: {
-                user_id: 0
+                user_id: user.id
             },
             attributes: ['device_id', 'name', 'telp', 'expired_at', 'device_status']
         })
@@ -51,7 +60,7 @@ const device_class = class DeviceClass {
             where: {
                 device_id: this.device_id
             },
-            attributes: ['device_id', 'name', 'telp', 'api_key', 'webhook']
+            attributes: ['device_id', 'name', 'telp', 'api_key', 'webhook', 'expired_at']
         })
 
         return device
@@ -67,9 +76,11 @@ const device_class = class DeviceClass {
             device_id: "DEVICE"+Math.floor(Math.random() * 101)+100,
             name: this.name,
             telp: this.telp,
-            user_id: 0,
+            user_id: user.id,
             device_status: this.device_status
         })
+
+        return true
     }
 
     async updateDevice(update) {
@@ -92,6 +103,24 @@ const device_class = class DeviceClass {
         }
 
         return true
+    }
+
+    async isActiveDevice() {
+        const device = await Device.findOne({
+            where: {
+                api_key: this.api_key
+            }
+        })
+
+        if (!device) {
+            return false
+        }
+
+        if (device.device_status !== "ACTIVE") {
+            return false
+        }
+
+        return device
     }
     
     isValidUrl() {
@@ -122,6 +151,16 @@ const device_class = class DeviceClass {
         return response
     }
 
+    setExpiredAt() {
+        const expired_at = date.addDays(new Date(), 30);
+        this.expired_at = date.format(expired_at, 'YYYY-MM-DD HH:mm:ss');
+    }
+
+    setBeforeExpiredAt() {
+        const expired_at = date.addDays(this.expired_at, -30);
+        this.expired_at = date.format(expired_at, 'YYYY-MM-DD HH:mm:ss');
+    }
+
     async callWebhook() {
         const response = this.responseWebhook()
         // const is_valid_url = this.isValidUrl(this.webhook)
@@ -144,6 +183,42 @@ const device_class = class DeviceClass {
         });
 
         return true
+    }
+
+    async activateDevice() {this.setExpiredAt()
+
+        var update = {
+            expired_at: this.expired_at,
+            device_status: "ACTIVE"
+        }
+        
+        await Device.update(update, {
+            where: {
+                device_id: this.device_id
+            }
+        });
+
+        return 1
+    }
+
+    async nonActivateDevice() {
+        const get_device = await this.getDevice()
+        this.expired_at = get_device.expired_at
+        
+        this.setBeforeExpiredAt()
+
+        var update = {
+            expired_at: this.expired_at,
+            device_status: "NON ACTIVE"
+        }
+        
+        await Device.update(update, {
+            where: {
+                device_id: this.device_id
+            }
+        });
+
+        return 1
     }
 }
 

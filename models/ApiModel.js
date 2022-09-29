@@ -24,6 +24,7 @@ export const Device = database.define('devices', {
     user_id: Sequelize.STRING,
     api_key: Sequelize.STRING,
     webhook: Sequelize.STRING,
+    webhook_group: Sequelize.STRING,
     expired_at: Sequelize.STRING,
     device_status: Sequelize.STRING
 });

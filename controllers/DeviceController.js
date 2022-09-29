@@ -23,22 +23,27 @@ export const getDevice = async(req, res) => {
 export const storeDevice = async(req, res) => {
     const { name, telp } = req.body
     
-    let get_device = 
+    let store_device = 
         await new DeviceClass()
         .setName(name)
         .setTelp(telp)
         .storeDevice()
 
-    return response(res, 200, true, '', get_device)
+    if (store_device == false) {
+        return response(res, 200, false, 'Telp already used!')    
+    }
+
+    return response(res, 200, true, '', store_device)
 }
 
 export const updateDevice = async(req, res) => {
-    const { api_key, webhook } = req.body
+    const { api_key, webhook, webhook_group } = req.body
     const { device_id } = req.params
     
     var update = {
         api_key: api_key,
-        webhook: webhook
+        webhook: webhook,
+        webhook_group: webhook_group
     }
     
     let update_device = 

@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import AuthValidator from './middlewares/AuthValidator.js'
+import DeviceValidator from './middlewares/DeviceValidator.js'
 import sessionsRoute from './routes/sessionsRoute.js'
 import chatsRoute from './routes/chatsRoute.js'
 import groupsRoute from './routes/groupsRoute.js'
@@ -10,8 +11,8 @@ import response from './response.js'
 
 const router = Router()
 
-router.use('/sessions', sessionsRoute)
-router.use('/chats', chatsRoute)
+router.use('/sessions', DeviceValidator, sessionsRoute)
+router.use('/chats', DeviceValidator, chatsRoute)
 router.use('/groups', groupsRoute)
 router.use('/auth', AuthRoute)
 router.use('/device', AuthValidator, DeviceRoute)

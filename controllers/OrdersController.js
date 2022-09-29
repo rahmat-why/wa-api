@@ -40,5 +40,31 @@ export const storeOrder = async(req, res) => {
         .setProductId(product_id)
         .storeOrder()
 
+    if (store_order == false) {
+        return response(res, 200, false, 'Cannot order! Device is running!')
+    }
+
     return response(res, 200, true, '', store_order)
+}
+
+export const acceptOrder = async(req, res) => {
+    const { order_id } = req.body
+
+    let accept_order = 
+        await new OrderClass()
+        .setOrderId(order_id)
+        .acceptOrder()
+
+    return response(res, 200, true, '', accept_order)
+}
+
+export const cancelOrder = async(req, res) => {
+    const { order_id } = req.body
+
+    let cancel_order = 
+        await new OrderClass()
+        .setOrderId(order_id)
+        .cancelOrder()
+
+    return response(res, 200, true, '', cancel_order)
 }

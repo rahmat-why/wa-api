@@ -20,7 +20,8 @@ const status = (req, res) => {
 }
 
 const add = (req, res) => {
-    const { id, isLegacy } = req.body
+    var id = res.locals.sessionId
+    var isLegacy = true
 
     if (isSessionExists(id)) {
         return response(res, 409, false, 'Session already exists, please use another id.')
