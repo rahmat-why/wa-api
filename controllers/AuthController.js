@@ -76,5 +76,5 @@ export const verifyOtp = async(req, res) => {
         .setTelp(telp)
         .generateToken()
 
-    return response(res, 200, false, '', generate_token)
+    return response(res, 200, true, '', generate_token)
 }
