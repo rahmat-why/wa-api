@@ -85,9 +85,15 @@ const auth_class = class AuthClass {
         var token = jsonwebtoken.sign(JSON.stringify(user), 'shhhhh');
         const update_user = await this.updateUser({token: token})
         var verify_token = this.verifyToken(token)
-        verify_token.token = token
         
-        return verify_token
+        var new_user = {
+            id: verify_token.id,
+            name: verify_token.name,
+            telp: verify_token.telp,
+            token: token
+        }
+
+        return new_user
     }
 
     async verifyToken(token) {
