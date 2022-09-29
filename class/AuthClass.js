@@ -1,8 +1,7 @@
 import jsonwebtoken from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import {
-    User,
-    Config
+    User
 } from './../models/ApiModel.js'
 
 const auth_class = class AuthClass {
@@ -31,16 +30,6 @@ const auth_class = class AuthClass {
         this.password = hash
         
         return this
-    }
-
-    async getConfig(key) {
-        const config = await Config.findOne({
-            where: {
-                key: key
-            }
-        })
-
-        return config
     }
 
     async storeUser() {
