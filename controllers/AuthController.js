@@ -6,6 +6,15 @@ export const register = async(req, res) => {
     const otp = Math.floor(Math.random() * 1001)+1000;
     const { name, telp } = req.body
 
+    let is_exist_user = 
+        await new AuthClass()
+        .setTelp(telp)
+        .isExistUser()
+
+    if (is_exist_user) {
+        return response(res, 400, false, 'Account registered!')
+    }
+
     const session = getSession(process.env.SESSION_ID)
     const receiver = formatPhone(telp)
 
