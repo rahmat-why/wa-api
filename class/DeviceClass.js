@@ -4,12 +4,12 @@ import {
 import { URL, parse } from 'url';
 import request from 'request';
 import date from 'date-and-time';
-import { LocalStorage } from "node-localstorage";
-const localStorage = new LocalStorage('./scratch');
-const user = localStorage.getItem("user")
+import AuthClass from './../class/AuthClass.js'
+import { getSession, getChatList, isExists, sendMessage, formatPhone } from './../whatsapp.js'
 
 const device_class = class DeviceClass {
     constructor() {
+        this.token = null
         this.device_id = null
         this.name = null
         this.telp = null
@@ -17,6 +17,11 @@ const device_class = class DeviceClass {
         this.webhook = null
         this.expired_at = null
         this.device_status = "PENDING"
+    }
+
+    setToken(token) {
+        this.token = token
+        return this
     }
 
     setDeviceId(device_id) {
@@ -45,9 +50,13 @@ const device_class = class DeviceClass {
     }
 
     async showDevice() {
+        const verify_token = 
+            await new AuthClass()
+            .verifyToken(this.token)
+
         const device = await Device.findAll({
             where: {
-                user_id: user.id
+                user_id: verify_token.id
             },
             attributes: ['device_id', 'name', 'telp', 'expired_at', 'device_status']
         })
@@ -60,24 +69,23 @@ const device_class = class DeviceClass {
             where: {
                 device_id: this.device_id
             },
-            attributes: ['device_id', 'name', 'telp', 'api_key', 'webhook', 'expired_at']
+            attributes: ['device_id', 'name', 'telp', 'api_key', 'webhook', 'webhook_group', 'expired_at']
         })
 
         return device
     }
 
     async storeDevice() {
-        const is_exist_device = await this.isExistDevice()
-        if (is_exist_device) {
-            return false
-        }
+        const verify_token = 
+            await new AuthClass()
+            .verifyToken(this.token)
         
         await Device.create({
             device_id: "DEVICE"+Math.floor(Math.random() * 101)+100,
             name: this.name,
             telp: this.telp,
-            user_id: user.id,
-            device_status: this.device_status
+            user_id: verify_token.id,
+            device_status: "NOT ACTIVE"
         })
 
         return true
@@ -120,7 +128,15 @@ const device_class = class DeviceClass {
             return false
         }
 
-        return device
+        return true
+    }
+
+    async isValidWhatsappNumber() {
+        const session = getSession(process.env.SESSION_ID)
+        const receiver = formatPhone(this.telp)
+        const exists = await isExists(session, receiver)
+
+        return exists
     }
     
     isValidUrl() {
@@ -142,7 +158,7 @@ const device_class = class DeviceClass {
             key: {
               id: Math.floor(Math.random() * 10001)+10000,
               sessionId: "6281248891487",
-              telp: "6289636286462@s.whatsapp.net",
+              telp: process.env.SESSION_ID+"@s.whatsapp.net",
               name: "Angel Ping Bot",
               message: "This is example message"
             }
@@ -156,8 +172,9 @@ const device_class = class DeviceClass {
         this.expired_at = date.format(expired_at, 'YYYY-MM-DD HH:mm:ss');
     }
 
-    setBeforeExpiredAt() {
-        const expired_at = date.addDays(this.expired_at, -30);
+    async setBeforeExpiredAt() {
+        const get_device = await this.getDevice()
+        const expired_at = date.addDays(get_device.expired_at, -30);
         this.expired_at = date.format(expired_at, 'YYYY-MM-DD HH:mm:ss');
     }
 
@@ -182,10 +199,11 @@ const device_class = class DeviceClass {
             console.log(response.body);
         });
 
-        return true
+        return response
     }
 
-    async activateDevice() {this.setExpiredAt()
+    async activateDevice() {
+        this.setExpiredAt()
 
         var update = {
             expired_at: this.expired_at,
@@ -202,14 +220,11 @@ const device_class = class DeviceClass {
     }
 
     async nonActivateDevice() {
-        const get_device = await this.getDevice()
-        this.expired_at = get_device.expired_at
-        
-        this.setBeforeExpiredAt()
-
+        await this.setBeforeExpiredAt()
+        console.log(this.expired_at)
         var update = {
             expired_at: this.expired_at,
-            device_status: "NON ACTIVE"
+            device_status: "NOT ACTIVE"
         }
         
         await Device.update(update, {

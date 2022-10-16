@@ -1,7 +1,5 @@
 import response from './../response.js'
 import AuthClass from './../class/AuthClass.js'
-import { LocalStorage } from "node-localstorage";
-const localStorage = new LocalStorage('./scratch');
 
 const validate = async(req, res, next) => {
     var authorization = req.headers["authorization"]
@@ -28,8 +26,6 @@ const validate = async(req, res, next) => {
     if (verify_token === undefined) {
         return response(res, 401, false, 'Not authenticated')
     }
-
-    localStorage.setItem('user', verify_token)
     
     next()
 }

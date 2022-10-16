@@ -6,9 +6,6 @@ import {
 import date from 'date-and-time';
 import sequelize from'sequelize'
 import DeviceClass from './DeviceClass.js'
-import { LocalStorage } from "node-localstorage";
-const localStorage = new LocalStorage('./scratch');
-const user = localStorage.getItem("user")
 
 const order_class = class OrderClass {
     constructor() {
@@ -19,7 +16,6 @@ const order_class = class OrderClass {
         this.payment_status = "UNPAID"
         this.due_at = null
         this.product_id = null
-        this.price = null
         this.quantity = 1
     }
 
@@ -61,7 +57,7 @@ const order_class = class OrderClass {
     }
 
     async getProduct() {
-        const product = await Product.findOne({
+        var product = await Product.findOne({
             where: {
                 product_id: this.product_id
             },
@@ -69,7 +65,7 @@ const order_class = class OrderClass {
         })
 
         if (product !== null) {
-            this.price = product.price
+            product.detail_features = JSON.parse(product.detail_features)   
         }
 
         return product
@@ -93,8 +89,7 @@ const order_class = class OrderClass {
                 order_id: this.order_id
             },
             attributes: [
-                'order_id','device_id','total_payment','payment_status','due_at', ['unique_code', 'fee'],
-                [sequelize.fn('COUNT', sequelize.col('order_id')), 'quantity']
+                'order_id','device_id','total_payment','payment_status','due_at', ['unique_code', 'fee']
             ]
         })
 
@@ -103,20 +98,6 @@ const order_class = class OrderClass {
 
     async storeOrder() {
         this.setOrderAt()
-
-        const get_device = 
-            await new DeviceClass()
-            .setDeviceId(this.device_id)
-            .getDevice()
-
-        let is_active_device = 
-            await new DeviceClass()
-            .setApiKey(get_device.api_key)
-            .isActiveDevice()
-
-        if (is_active_device != false) {
-            return false
-        }
 
         const unique_code = this.generateUniqueCode()
         const get_product = await this.getProduct()
@@ -140,10 +121,12 @@ const order_class = class OrderClass {
     }
 
     async storeDetailOrder() {
+        const get_product = await this.getProduct()
+
         await DetailOrder.create({
             order_id: this.order_id,
             product_id: this.product_id,
-            price: this.price,
+            price: get_product.price,
             quantity: this.quantity
         })
     }
@@ -160,14 +143,15 @@ const order_class = class OrderClass {
         });
 
         const get_order = await this.getOrder()
-        await new DeviceClass()
-        .setDeviceId(get_order.device_id)
-        .activateDevice()
+        let activate_device = 
+            await new DeviceClass()
+            .setDeviceId(get_order.device_id)
+            .activateDevice()
 
         return 1
     }
 
-    async cancelOrder() {
+    async rollbackAcceptOrder() {
         var update = {
             payment_status: "UNPAID"
         }
@@ -179,11 +163,49 @@ const order_class = class OrderClass {
         });
 
         const get_order = await this.getOrder()
-        await new DeviceClass()
-        .setDeviceId(get_order.device_id)
-        .nonActivateDevice()
+        let non_activate_device = 
+            await new DeviceClass()
+            .setDeviceId(get_order.device_id)
+            .nonActivateDevice()
 
         return 1
+    }
+
+    async isPaidOrder() {
+        const get_order = await this.getOrder()
+        if (!get_order) {
+            return false
+        }
+
+        if (get_order.payment_status === "PAID") {
+            return true
+        }
+        
+        return false
+    }
+
+    async isExistOrder() {
+        const get_order = await this.getOrder()
+        if (!get_order) {
+            return false
+        }
+
+        return true
+    }
+
+    async isRunningOrder() {
+        var order = await Order.findOne({
+            where: {
+                device_id: this.device_id,
+                payment_status: "UNPAID"
+            }
+        })
+
+        if (!order) {
+            return false
+        }
+
+        return true
     }
 }
 

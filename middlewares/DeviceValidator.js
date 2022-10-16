@@ -13,7 +13,7 @@ const validate = async(req, res, next) => {
         .isActiveDevice()
 
     if (!is_active_device) {
-        return response(res, 401, false, 'Angel key invalid')
+        return response(res, 401, false, 'Device not active!')
     }
 
     res.locals.sessionId = is_active_device.device_id

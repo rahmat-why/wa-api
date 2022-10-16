@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import {
     User
 } from './../models/ApiModel.js'
+import { getSession, isExists, sendMessage, formatPhone } from './../whatsapp.js'
 
 const auth_class = class AuthClass {
     constructor() {
@@ -104,6 +105,16 @@ const auth_class = class AuthClass {
         const is_valid = bcrypt.compareSync(this.otp, user.password);
 
         return is_valid
+    }
+
+    async sendOtp() {
+        const otp = Math.floor(Math.random() * 1001)+1000;
+        const session = getSession(process.env.SESSION_ID)
+        const receiver = formatPhone(this.telp)
+    
+        await sendMessage(session, receiver, {text: "OTP anda "+otp}, 0)
+
+        return otp
     }
 }
 

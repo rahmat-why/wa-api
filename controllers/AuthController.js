@@ -1,89 +1,127 @@
 import response from './../response.js'
 import AuthClass from './../class/AuthClass.js'
-import { getSession, isExists, sendMessage, formatPhone } from './../whatsapp.js'
+import DeviceClass from './../class/DeviceClass.js'
+
+export const getUser = async(req, res) => {
+    try {
+        var authorization = req.headers["authorization"].split(" ")
+        const token = authorization[1]
+
+        const verify_token = 
+            await new AuthClass()
+            .verifyToken(token)
+
+        const get_user = 
+            await new AuthClass()
+            .setTelp(verify_token.telp)
+            .getUser()
+        
+        return response(res, 401, true, "user found!", get_user)
+    } catch (err) {
+        return response(res, 401, true, err.message, {})
+    }
+}
 
 export const register = async(req, res) => {
-    const otp = Math.floor(Math.random() * 1001)+1000;
     const { name, telp } = req.body
 
-    let is_exist_user = 
-        await new AuthClass()
-        .setTelp(telp)
-        .isExistUser()
+    try {
+        let is_exist_user = 
+            await new AuthClass()
+            .setTelp(telp)
+            .isExistUser()
 
-    if (is_exist_user) {
-        return response(res, 400, false, 'Account registered!')
+        if (is_exist_user) {
+            return response(res, 400, false, 'Warning! account registered!', {})
+        }
+
+        let is_valid_whatsapp_number = 
+            await new DeviceClass()
+            .setTelp(telp)
+            .isValidWhatsappNumber()
+        
+        if (!is_valid_whatsapp_number) {
+            return response(res, 400, false, 'This whatsapp number is not valid!', {})
+        }
+
+        let send_otp = 
+            await new AuthClass()
+            .setTelp(telp)
+            .sendOtp()
+
+        let store_user = 
+            await new AuthClass()
+            .setPassword(send_otp)
+            .setName(name)
+            .setTelp(telp)
+            .storeUser()
+
+        return response(res, 200, true, 'OTP sent successfully via Whatsapp!', {})
+    } catch (err) {
+        return response(res, 401, true, err.message, {})
     }
-
-    const session = getSession(process.env.SESSION_ID)
-    const receiver = formatPhone(telp)
-
-    const exists = await isExists(session, receiver)
-    if (!exists) {
-        return response(res, 400, false, 'The receiver number is not exists.')
-    }
-
-    await sendMessage(session, receiver, {text: "OTP anda "+otp}, 0)
-
-    let store_user = 
-        await new AuthClass()
-        .setPassword(otp)
-        .setName(name)
-        .setTelp(telp)
-        .storeUser()
-
-    return response(res, 200, true, '', exists)
 }
 
 export const login = async(req, res) => {
-    const otp = Math.floor(Math.random() * 1001)+1000;
     const { telp } = req.body
 
-    let is_exist_user = 
-        await new AuthClass()
-        .setTelp(telp)
-        .isExistUser()
+    try {
+        let is_exist_user = 
+            await new AuthClass()
+            .setTelp(telp)
+            .isExistUser()
 
-    if (!is_exist_user) {
-        return response(res, 400, false, 'Account not registered!')
+        if (!is_exist_user) {
+            return response(res, 400, false, 'Account not registered!')
+        }
+
+        let send_otp = 
+            await new AuthClass()
+            .setTelp(telp)
+            .sendOtp()
+
+        let password = 
+            new AuthClass()
+            .setPassword(send_otp)
+            .password
+
+        let update_user = 
+            await new AuthClass()
+            .setTelp(telp)
+            .updateUser({password: password})
+
+        return response(res, 200, true, 'Login success! OTP sent successfully via Whatsapp!', {})
+    } catch (err) {
+        return response(res, 401, true, err.message, {})
     }
-
-    const session = getSession(process.env.SESSION_ID)
-    const receiver = formatPhone(telp)
-
-    const exists = await isExists(session, receiver)
-    if (!exists) {
-        return response(res, 400, false, 'The receiver number is not exists.')
-    }
-
-    await sendMessage(session, receiver, {text: "OTP anda "+otp}, 0)
-
-    let password = new AuthClass().setPassword(otp).password
-    let update_user = 
-        await new AuthClass()
-        .setTelp(telp)
-        .updateUser({password: password})
-
-    return response(res, 200, true, '', update_user)
 }
 
 export const verifyOtp = async(req, res) => {
     const { telp, otp } = req.body
 
-    let verify_otp = 
-        await new AuthClass()
-        .setPassword(otp)
-        .setTelp(telp)
-        .verifyPassword()
+    try {
+        let verify_otp = 
+            await new AuthClass()
+            .setPassword(otp)
+            .setTelp(telp)
+            .verifyPassword()
 
-    if (!verify_otp) {
-        return response(res, 400, false, "OTP Invalid")
+        if (!verify_otp) {
+            return response(res, 400, false, "OTP Invalid")
+        }
+
+        var generate_token = 
+            await new AuthClass()
+            .setTelp(telp)
+            .generateToken()
+
+        let update_token = 
+            await new AuthClass()
+            .setTelp(telp)
+            .updateUser({token: generate_token.token})
+
+        return response(res, 200, true, 'OTP verified!', generate_token)
+    } catch (err) {
+        return response(res, 401, true, err.message, {})
     }
-
-    var generate_token = 
-        await new AuthClass()
-        .setTelp(telp)
-        .generateToken()
-
-    return response(res, 200, true, '', generate_token)
 }
