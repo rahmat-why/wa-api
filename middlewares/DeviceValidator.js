@@ -16,7 +16,12 @@ const validate = async(req, res, next) => {
         return response(res, 401, false, 'Device not active!')
     }
 
-    res.locals.sessionId = is_active_device.device_id
+    let get_device_by_key = 
+        await new DeviceClass()
+        .setApiKey(api_key)
+        .getDeviceByKey()
+    console.log(get_device_by_key.device_id)
+    res.locals.sessionId = get_device_by_key.device_id
 
     next()
 }

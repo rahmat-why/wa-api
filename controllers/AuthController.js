@@ -16,7 +16,7 @@ export const getUser = async(req, res) => {
             .setTelp(verify_token.telp)
             .getUser()
         
-        return response(res, 401, true, "user found!", get_user)
+        return response(res, 200, true, "user found!", get_user)
     } catch (err) {
         return response(res, 401, true, err.message, {})
     }
@@ -32,7 +32,7 @@ export const register = async(req, res) => {
             .isExistUser()
 
         if (is_exist_user) {
-            return response(res, 400, false, 'Warning! account registered!', {})
+            return response(res, 422, false, 'Warning! account registered!', {})
         }
 
         let is_valid_whatsapp_number = 
@@ -41,7 +41,7 @@ export const register = async(req, res) => {
             .isValidWhatsappNumber()
         
         if (!is_valid_whatsapp_number) {
-            return response(res, 400, false, 'This whatsapp number is not valid!', {})
+            return response(res, 422, false, 'This whatsapp number is not valid!', {})
         }
 
         let send_otp = 
@@ -66,15 +66,6 @@ export const login = async(req, res) => {
     const { telp } = req.body
 
     try {
-        let is_exist_user = 
-            await new AuthClass()
-            .setTelp(telp)
-            .isExistUser()
-
-        if (!is_exist_user) {
-            return response(res, 400, false, 'Account not registered!')
-        }
-
         let send_otp = 
             await new AuthClass()
             .setTelp(telp)
@@ -107,7 +98,7 @@ export const verifyOtp = async(req, res) => {
             .verifyPassword()
 
         if (!verify_otp) {
-            return response(res, 400, false, "OTP Invalid")
+            return response(res, 422, false, "OTP Invalid")
         }
 
         var generate_token = 

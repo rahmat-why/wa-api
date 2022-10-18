@@ -44,16 +44,16 @@ export const storeDevice = async(req, res) => {
             .isExistDevice()
 
         if (is_exist_device) {
-            return response(res, 200, false, 'Telp already used!')    
+            return response(res, 422, false, 'Telp already used!')    
         }
         
         let is_valid_whatsapp_number = 
             await new DeviceClass()
             .setTelp(telp)
             .isValidWhatsappNumber()
-        
+
         if (!is_valid_whatsapp_number) {
-            return response(res, 400, false, 'This whatsapp number is not valid!')
+            return response(res, 422, false, 'This whatsapp number is not valid!')
         }
 
         let store_device = 
@@ -70,21 +70,20 @@ export const storeDevice = async(req, res) => {
 }
 
 export const updateDevice = async(req, res) => {
-    const { api_key, webhook, webhook_group } = req.body
+    const { webhook, webhook_group } = req.body
     const { device_id } = req.params
     
     try {
         let is_active_device = 
             await new DeviceClass()
-            .setApiKey(api_key)
+            .setDeviceId(device_id)
             .isActiveDevice()
 
         if (!is_active_device) {
-            return response(res, 401, false, 'Device not active!')
+            return response(res, 402, false, 'Device not active!')
         }
         
         var update = {
-            api_key: api_key,
             webhook: webhook,
             webhook_group: webhook_group
         }

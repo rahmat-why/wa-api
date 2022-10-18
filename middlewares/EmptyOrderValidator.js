@@ -9,13 +9,13 @@ const validate = async(req, res, next) => {
             var order_id = req.params.order_id
         }
 
-        var get_order = 
+        var is_exist_order = 
             await new OrderClass()
             .setOrderId(order_id)
-            .getOrder()
+            .isExistOrder()
 
-        if (!get_order) {
-            return response(res, 400, true, 'Order not found!', {})
+        if (!is_exist_order) {
+            return response(res, 422, true, 'Order not found!', {})
         }
 
         next()

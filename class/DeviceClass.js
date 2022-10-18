@@ -75,6 +75,17 @@ const device_class = class DeviceClass {
         return device
     }
 
+    async getDeviceByKey() {
+        const device = await Device.findOne({
+            where: {
+                api_key: this.api_key
+            },
+            attributes: ['device_id', 'name', 'telp', 'api_key', 'webhook', 'webhook_group', 'expired_at']
+        })
+
+        return device
+    }
+
     async storeDevice() {
         const verify_token = 
             await new AuthClass()
@@ -100,13 +111,8 @@ const device_class = class DeviceClass {
     }
     
     async isExistDevice() {
-        const device = await Device.findOne({
-            where: {
-                telp: this.telp
-            }
-        })
-
-        if (device === null) {
+        const get_device = await this.getDevice()
+        if (!get_device) {
             return false
         }
 
@@ -114,11 +120,19 @@ const device_class = class DeviceClass {
     }
 
     async isActiveDevice() {
-        const device = await Device.findOne({
-            where: {
-                api_key: this.api_key
-            }
-        })
+        if (this.api_key) {
+            var device = await Device.findOne({
+                where: {
+                    api_key: this.api_key
+                }
+            })
+        }else{
+            var device = await Device.findOne({
+                where: {
+                    device_id: this.device_id
+                }
+            })
+        }
 
         if (!device) {
             return false

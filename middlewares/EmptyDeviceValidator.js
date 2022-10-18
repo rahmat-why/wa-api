@@ -12,10 +12,10 @@ const validate = async(req, res, next) => {
         var get_device = 
             await new DeviceClass()
             .setDeviceId(device_id)
-            .getDevice()
+            .isExistDevice()
 
         if (!get_device) {
-            return response(res, 400, true, 'Device not found!', {})
+            return response(res, 422, true, 'Device not found!', {})
         }
 
         next()

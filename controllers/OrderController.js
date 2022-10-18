@@ -25,7 +25,7 @@ export const getProduct = async(req, res) => {
             .getProduct()
 
         if (get_product === null) {
-            return response(res, 400, true, 'Product not found!', {})
+            return response(res, 404, true, 'Product not found!', {})
         }
 
         return response(res, 200, true, 'Product found!', get_product)
@@ -59,7 +59,7 @@ export const storeOrder = async(req, res) => {
             .isRunningOrder()
 
         if (is_running_order) {
-            return response(res, 200, false, 'Current order with this Device is running!')
+            return response(res, 422, false, 'Current order with this Device is running!')
         }
 
         const get_device = 
@@ -73,7 +73,7 @@ export const storeOrder = async(req, res) => {
             .isActiveDevice()
 
         if (is_active_device) {
-            return response(res, 200, false, 'Cannot order! Device already active!')
+            return response(res, 422, false, 'Cannot order! Device already active!')
         }
 
         let store_order = 
