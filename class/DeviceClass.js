@@ -86,6 +86,17 @@ const device_class = class DeviceClass {
         return device
     }
 
+    async getDeviceByTelp() {
+        const device = await Device.findOne({
+            where: {
+                telp: this.telp
+            },
+            attributes: ['device_id', 'name', 'telp', 'api_key', 'webhook', 'webhook_group', 'expired_at']
+        })
+
+        return device
+    }
+
     async storeDevice() {
         const verify_token = 
             await new AuthClass()
@@ -111,7 +122,7 @@ const device_class = class DeviceClass {
     }
     
     async isExistDevice() {
-        const get_device = await this.getDevice()
+        const get_device = await this.getDeviceByTelp()
         if (!get_device) {
             return false
         }
