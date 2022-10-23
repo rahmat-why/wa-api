@@ -62,14 +62,9 @@ export const storeOrder = async(req, res) => {
             return response(res, 422, false, 'Current order with this Device is running!')
         }
 
-        const get_device = 
-            await new DeviceClass()
-            .setDeviceId(device_id)
-            .getDevice()
-
         let is_active_device = 
             await new DeviceClass()
-            .setApiKey(get_device.api_key)
+            .setDeviceId(device_id)
             .isActiveDevice()
 
         if (is_active_device) {

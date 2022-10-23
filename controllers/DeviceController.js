@@ -78,7 +78,7 @@ export const updateDevice = async(req, res) => {
             await new DeviceClass()
             .setDeviceId(device_id)
             .isActiveDevice()
-        console.log(device_id)
+
         if (!is_active_device) {
             return response(res, 402, false, 'Device not active!')
         }
