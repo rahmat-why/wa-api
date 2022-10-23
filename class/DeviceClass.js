@@ -122,7 +122,14 @@ const device_class = class DeviceClass {
     }
     
     async isExistDevice() {
-        const get_device = await this.getDeviceByTelp()
+        if (this.device_id) {
+            var get_device = await this.getDevice()
+        }else if(this.telp) {
+            var get_device = await this.getDeviceByTelp()
+        }else if(this.api_key) {
+            var get_device = await this.getDeviceByKey()
+        }
+        
         if (!get_device) {
             return false
         }
@@ -131,25 +138,19 @@ const device_class = class DeviceClass {
     }
 
     async isActiveDevice() {
-        if (this.api_key) {
-            var device = await Device.findOne({
-                where: {
-                    api_key: this.api_key
-                }
-            })
-        }else{
-            var device = await Device.findOne({
-                where: {
-                    device_id: this.device_id
-                }
-            })
+        if (this.device_id) {
+            var get_device = await this.getDevice()
+        }else if(this.telp) {
+            var get_device = await this.getDeviceByTelp()
+        }else if(this.api_key) {
+            var get_device = await this.getDeviceByKey()
         }
 
-        if (!device) {
+        if (!get_device) {
             return false
         }
 
-        if (device.device_status !== "ACTIVE") {
+        if (get_device.device_status !== "ACTIVE") {
             return false
         }
 
