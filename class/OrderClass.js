@@ -106,7 +106,7 @@ const order_class = class OrderClass {
 
         this.setOrderId("TRX"+unique_code)
         
-        await Order.create({
+        const store_order = await Order.create({
             order_id: this.order_id,
             device_id: this.device_id,
             total_payment: total_payment,
@@ -118,6 +118,8 @@ const order_class = class OrderClass {
         })
 
         await this.storeDetailOrder()
+
+        return store_order
     }
 
     async storeDetailOrder() {

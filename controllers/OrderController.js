@@ -77,7 +77,7 @@ export const storeOrder = async(req, res) => {
             .setProductId(product_id)
             .storeOrder()
 
-        return response(res, 200, true, 'Order success!', {})
+        return response(res, 200, true, 'Order success!', store_order)
     } catch (err) {
         return response(res, 401, true, err.message, {})
     }

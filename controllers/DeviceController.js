@@ -1,5 +1,6 @@
 import response from './../response.js'
 import DeviceClass from './../class/DeviceClass.js'
+import ChatClass from './../class/ChatClass.js'
 
 export const showDevice = async(req, res) => {
     try {
@@ -100,15 +101,22 @@ export const updateDevice = async(req, res) => {
 }
 
 export const callWebhook = async(req, res) => {
+    const { device_id } = req.params
     const { webhook } = req.body
     
     try {
-        let call_webhook = 
-            await new DeviceClass()
+        var response_webhook = 
+            new DeviceClass
+            .setDeviceId(device_id)
+            .responseWebhook()
+        
+        var call_webhook = 
+            await new ChatClass()
+            .setResponse(response_webhook)
             .setWebhook(webhook)
             .callWebhook()
 
-        return response(res, 200, true, 'Webhook called successfully!', call_webhook)
+        return response(res, 200, true, 'Webhook called successfully!', response_webhook)
     } catch (err) {
         return response(res, 401, true, err.message, {})
     }

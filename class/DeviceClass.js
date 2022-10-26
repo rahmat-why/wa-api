@@ -204,30 +204,6 @@ const device_class = class DeviceClass {
         this.expired_at = date.format(expired_at, 'YYYY-MM-DD HH:mm:ss');
     }
 
-    async callWebhook() {
-        const response = this.responseWebhook()
-        // const is_valid_url = this.isValidUrl(this.webhook)
-        // if (!is_valid_url) {
-        //     return false
-        // }
-
-        var options = {
-            'method': 'POST',
-            'url': this.webhook,
-            'headers': {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(response)
-        };
-        
-        request(options, function (error, response) {
-            if (error) throw new Error(error);
-            console.log(response.body);
-        });
-
-        return response
-    }
-
     async activateDevice() {
         this.setExpiredAt()
 
