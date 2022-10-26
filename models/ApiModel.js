@@ -70,3 +70,26 @@ export const Config = database.define('config', {
     },
     value: Sequelize.STRING
 });
+
+export const Schedule = database.define('schedule', {
+    schedule_id: {
+        primaryKey: true,
+        type: Sequelize.STRING,
+    },
+    title: Sequelize.STRING,
+    total_receiver: Sequelize.STRING,
+    user_id: Sequelize.STRING,
+});
+
+export const ScheduleReceiver = database.define('schedule_receiver', {
+    receiver_id: {
+        primaryKey: true,
+        type: Sequelize.STRING,
+    },
+    schedule_id: Sequelize.STRING,
+    device_id: Sequelize.STRING,
+    telp: Sequelize.STRING,
+    category: Sequelize.STRING,
+    schedule_time: Sequelize.STRING,
+    message: Sequelize.STRING,
+});
