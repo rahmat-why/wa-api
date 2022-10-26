@@ -14,6 +14,12 @@ import { toDataURL } from 'qrcode'
 import __dirname from './dirname.js'
 import response from './response.js'
 
+import fs from 'fs'
+import { URL, parse } from 'url';
+
+import ChatClass from './class/ChatClass.js'
+import DeviceClass from './class/DeviceClass.js'
+
 const sessions = new Map()
 const retries = new Map()
 
@@ -88,12 +94,57 @@ const createSession = async (sessionId, isLegacy = false, res = null) => {
     })
 
     // Automatically read incoming messages, uncomment below codes to enable this behaviour
-    /*
     wa.ev.on('messages.upsert', async (m) => {
         const message = m.messages[0]
-
         if (!message.key.fromMe && m.type === 'notify') {
             await delay(1000)
+
+            let device = 
+                await new DeviceClass()
+                .setDeviceId(sessionId)
+                .getDevice()
+
+            var remote = message.key.remoteJid.split("@")[1]
+
+            var valid_remote = ["s.whatsapp.net", "g.us"]
+            if (device === null || !valid_remote.includes(remote)) {
+                return false
+            }
+
+            if (remote === "s.whatsapp.net") {
+                if (device.webhook === null) {
+                    return false
+                }
+
+                var formatted_response_chat = 
+                    await new ChatClass()
+                    .setSessionId(sessionId)
+                    .setMessage(message)
+                    .formatWebhookChat()
+
+                var call_webhook = 
+                    await new ChatClass()
+                    .setResponse(formatted_response_chat)
+                    .setWebhook(device.webhook)
+                    .callWebhook()
+                    
+            }else if(remote === "g.us"){
+                if (device.webhook_group === null) {
+                    return false
+                }
+
+                var formatted_response_chat = 
+                    await new ChatClass()
+                    .setSessionId(sessionId)
+                    .setMessage(message)
+                    .formatWebhookGroup()
+
+                var call_webhook = 
+                    await new ChatClass()
+                    .setResponse(formatted_response_chat)
+                    .setWebhook(device.webhook)
+                    .callWebhook()
+            }
 
             if (isLegacy) {
                 await wa.chatRead(message.key, 1)
@@ -102,7 +153,6 @@ const createSession = async (sessionId, isLegacy = false, res = null) => {
             }
         }
     })
-    */
 
     wa.ev.on('connection.update', async (update) => {
         const { connection, lastDisconnect } = update
@@ -267,6 +317,20 @@ const init = () => {
     })
 }
 
+const isValidUrl = (s, protocols) => {
+    try {
+        new URL(s);
+        const parsed = parse(s);
+        return protocols
+            ? parsed.protocol
+                ? protocols.map(x => `${x.toLowerCase()}:`).includes(parsed.protocol)
+                : false
+            : true;
+    } catch (err) {
+        return false;
+    }
+};
+
 export {
     isSessionExists,
     createSession,
@@ -279,4 +343,5 @@ export {
     formatGroup,
     cleanup,
     init,
+    isValidUrl
 }
