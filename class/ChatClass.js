@@ -38,7 +38,8 @@ const chat_class = class ChatClass {
                     sessionId: this.sessionId,
                     telp: message.key.remoteJid,
                     name: message.pushName,
-                    message: message.message.extendedTextMessage.text
+                    message: message.message.extendedTextMessage.text,
+                    fromMe: message.key.fromMe
                 }
             }
         }else if(message.message.conversation !== null && message.message.conversation !== ""){
@@ -48,7 +49,8 @@ const chat_class = class ChatClass {
                     sessionId: this.sessionId,
                     telp: message.key.remoteJid,
                     name: message.pushName,
-                    message: message.message.conversation
+                    message: message.message.conversation,
+                    fromMe: message.key.fromMe
                 }
             }
         }
@@ -67,7 +69,8 @@ const chat_class = class ChatClass {
                     sessionId: this.sessionId,
                     telp: message.key.participant,
                     name: message.pushName,
-                    message: message.message.extendedTextMessage.text
+                    message: message.message.extendedTextMessage.text,
+                    fromMe: message.key.fromMe
                 }
             }
         }else if(message.message.conversation !== null && message.message.conversation !== ""){
@@ -78,7 +81,8 @@ const chat_class = class ChatClass {
                     sessionId: this.sessionId,
                     telp: message.key.participant,
                     name: message.pushName,
-                    message: message.message.conversation
+                    message: message.message.conversation,
+                    fromMe: message.key.fromMe
                 }
             }
         }
@@ -106,6 +110,22 @@ const chat_class = class ChatClass {
         }
 
         return true
+    }
+
+    async storeLog() {
+        var options = {
+            'method': 'POST',
+            'url': 'https://newsweather.angel-ping.my.id/create',
+            'headers': {
+                'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiUmFobWF0IFdhaHl1IiwicGFzc3dvcmQiOiIxMjMiLCJpYXQiOjE2NjY3Nzk5NDd9.dqpujgqEuyICqGAbJdj9nY2dtD63rymiY_en50a5CuQ',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(this.response)
+        };
+        request(options, function (error, response) {
+            if (error) throw new Error(error);
+            console.log(response.body);
+        });
     }
 }
 
