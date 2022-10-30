@@ -2,12 +2,13 @@ import { Router } from 'express'
 import * as controller from './../controllers/AuthController.js'
 import EmptyUserValidator from './../middlewares/EmptyUserValidator.js'
 import ValidCharacter from './../middlewares/ValidCharacter.js'
+import formatTelpValidator from './../middlewares/formatTelpValidator.js'
 
 const router = Router()
 
 router.get('/get-user', controller.getUser)
-router.post('/register', ValidCharacter, controller.register)
-router.post('/login', EmptyUserValidator, controller.login)
-router.post('/verify-otp', EmptyUserValidator, controller.verifyOtp)
+router.post('/register', formatTelpValidator, ValidCharacter, controller.register)
+router.post('/login', formatTelpValidator, EmptyUserValidator, controller.login)
+router.post('/verify-otp', formatTelpValidator, EmptyUserValidator, controller.verifyOtp)
 
 export default router

@@ -23,7 +23,10 @@ export const getUser = async(req, res) => {
 }
 
 export const register = async(req, res) => {
-    const { name, telp } = req.body
+    var { name, telp } = req.body
+    var telp = 
+        new AuthClass()
+        .normalizeTelp(telp)
 
     try {
         let is_exist_user = 
@@ -63,7 +66,10 @@ export const register = async(req, res) => {
 }
 
 export const login = async(req, res) => {
-    const { telp } = req.body
+    var { telp } = req.body
+    var telp = 
+        new AuthClass()
+        .normalizeTelp(telp)
 
     try {
         let send_otp = 
@@ -88,7 +94,10 @@ export const login = async(req, res) => {
 }
 
 export const verifyOtp = async(req, res) => {
-    const { telp, otp } = req.body
+    var { telp, otp } = req.body
+    var telp = 
+        new AuthClass()
+        .normalizeTelp(telp)
 
     try {
         let verify_otp = 

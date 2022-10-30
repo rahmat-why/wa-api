@@ -1,6 +1,7 @@
 import response from './../response.js'
 import DeviceClass from './../class/DeviceClass.js'
 import ChatClass from './../class/ChatClass.js'
+import AuthClass from './../class/AuthClass.js'
 
 export const showDevice = async(req, res) => {
     try {
@@ -34,7 +35,11 @@ export const getDevice = async(req, res) => {
 }
 
 export const storeDevice = async(req, res) => {
-    const { name, telp } = req.body
+    var { name, telp } = req.body
+    var telp = 
+        new AuthClass()
+        .normalizeTelp(telp)
+
     var authorization = req.headers["authorization"].split(" ")
     const token = authorization[1]
     

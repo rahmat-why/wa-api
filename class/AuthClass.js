@@ -33,6 +33,27 @@ const auth_class = class AuthClass {
         return this
     }
 
+    normalizeTelp(telp) {
+        var telp = String(telp).trim();
+        var telp = telp.replace(/[- .]/g, '');
+
+        if (telp.startsWith('+62')) {
+            telp = '62' + telp.slice(3);
+        } else if (telp.startsWith('0')) {
+            telp = '62' + telp.slice(1);
+        }
+
+        return telp
+    }
+
+    isValidFormatTelp(telp) {
+        if (!telp || !/^628[1-9][0-9]{7,10}$/.test(telp)) {
+            return false;
+        }
+
+        return true;
+    }
+
     async storeUser() {
         await User.create({
             name: this.name,
