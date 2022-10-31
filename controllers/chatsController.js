@@ -1,5 +1,10 @@
+import { join } from 'node:path'
+import { createReadStream } from 'node:fs'
+import { pipeline } from 'node:stream/promises'
+import csv from 'csv-parser'
 import { getSession, getChatList, isExists, sendMessage, formatPhone } from './../whatsapp.js'
 import response from './../response.js'
+import { Schedule, ScheduleReceiver } from '../models/ApiModel.js'
 
 const getList = (req, res) => {
     return response(res, 200, true, '', getChatList(res.locals.sessionId))
@@ -74,4 +79,29 @@ const sendBulk = async (req, res) => {
     )
 }
 
-export { getList, send, sendBulk }
+const showSchedule = async (req, res) => {
+    const schedules = await Schedule.findAll()
+
+    return res.send(schedules)
+}
+
+const showDetailSchedule = async (req, res) => {
+    const { schedule_id } = req.params
+    const detailSchedule = ScheduleReceiver.findAll({ where: { schedule_id } })
+
+    return res.send(detailSchedule)
+}
+
+const storeSchedule = async (req, res) => {
+    const csvFilePath = join(process.cwd(), req.file.path)
+    const results = []
+    createReadStream(csvFilePath).pipe(csv())
+      .on('data', (data) => {
+        results.push(data)
+    }).on('end', async () => {
+        const schedules = await Schedule.bulkCreate(results)
+        return res.send(schedules)
+    })
+}
+
+export { getList, send, sendBulk, showSchedule, showDetailSchedule, storeSchedule }
