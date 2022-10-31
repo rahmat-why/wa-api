@@ -8,6 +8,7 @@ import AuthRoute from './routes/AuthRoute.js'
 import DeviceRoute from './routes/DeviceRoute.js'
 import OrderRoute from './routes/OrderRoute.js'
 import ConfigRoute from './routes/ConfigRoute.js'
+import FolderContactRoute from './routes/FolderContactRoute.js'
 import response from './response.js'
 
 const router = Router()
@@ -19,6 +20,7 @@ router.use('/auth', AuthRoute)
 router.use('/device', AuthValidator, DeviceRoute)
 router.use('/order', AuthValidator, OrderRoute)
 router.use('/config', AuthValidator, ConfigRoute)
+router.use('/contact', AuthValidator, FolderContactRoute)
 
 router.all('*', (req, res) => {
     response(res, 404, false, 'The requested url cannot be found.')
