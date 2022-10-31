@@ -26,6 +26,8 @@ const validate = async(req, res, next) => {
     if (verify_token === undefined) {
         return response(res, 401, false, 'Not authenticated')
     }
+
+    req.verified_token = verify_token
     
     next()
 }
