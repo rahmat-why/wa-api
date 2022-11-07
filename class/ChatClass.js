@@ -107,6 +107,12 @@ const chat_class = class ChatClass {
 
         return true
     }
+
+    // showSchedule
+
+    // showDetailSchedule
+
+    // storeSchedule (jangan di bulk, di foreach di controller nya aja)
 }
 
 export default chat_class

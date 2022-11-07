@@ -99,7 +99,8 @@ const storeSchedule = async (req, res) => {
       .on('data', (data) => {
         results.push(data)
     }).on('end', async () => {
-        const schedules = await Schedule.bulkCreate(results)
+        console.log(JSON.stringify(results))
+        const schedules = await Schedule.bulkCreate(results, { individualHooks: true })
         return res.send(schedules)
     })
 }

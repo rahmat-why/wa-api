@@ -71,7 +71,7 @@ export const Config = database.define('config', {
     value: Sequelize.STRING
 });
 
-export const Schedule = database.define('schedule', {
+export const Schedule = database.define('schedules', {
     schedule_id: {
         primaryKey: true,
         type: Sequelize.STRING,
@@ -81,7 +81,7 @@ export const Schedule = database.define('schedule', {
     user_id: Sequelize.STRING,
 });
 
-export const ScheduleReceiver = database.define('schedule_receiver', {
+export const ScheduleReceiver = database.define('schedule_receivers', {
     receiver_id: {
         primaryKey: true,
         type: Sequelize.STRING,
