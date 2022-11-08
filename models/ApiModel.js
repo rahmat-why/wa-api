@@ -72,14 +72,17 @@ export const Config = database.define('config', {
 });
 
 export const Contact = database.define('contact', {
-    contact_id: Sequelize.STRING,
+    contact_id: {
+        primaryKey: true,
+        type: Sequelize.STRING
+    },
     folder_contact_id: Sequelize.STRING,
     name: Sequelize.STRING,
     telp: Sequelize.STRING,
     profile_picture: Sequelize.STRING
 });
 
-export const FolderContact = database.define('folder_contact', {
+export const Folder = database.define('folder_contact', {
     folder_contact_id: {
         primaryKey: true,
         type: Sequelize.STRING
