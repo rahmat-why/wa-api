@@ -6,7 +6,15 @@ const chat_class = class ChatClass {
     constructor() {
         this.webhook = null,
         this.sessionId = null,
-        this.message = null
+        this.category = null,
+        this.device_id = null,
+        this.telp = null,
+        this.schedule_at = null,
+        this.message = null,
+        this.title = null,
+        this.create_form = null,
+        this.folder_id = null,
+        this.total_receiver = null
     }
 
     setWebhook(webhook) {
@@ -19,6 +27,26 @@ const chat_class = class ChatClass {
         return this
     }
 
+    setCategory(category) {
+        this.category = category
+        return this
+    }
+
+    setDeviceId(device_id) {
+        this.device_id = device_id
+        return this
+    }
+
+    setTelp(telp) {
+        this.telp = telp
+        return this
+    }
+
+    setScheduleAt(schedule_at) {
+        this.schedule_at = schedule_at
+        return this
+    }
+
     setMessage(message) {
         this.message = message
         return this
@@ -26,6 +54,26 @@ const chat_class = class ChatClass {
 
     setResponse(response) {
         this.response = response
+        return this
+    }
+
+    setTitle(title) {
+        this.title = title
+        return this
+    }
+
+    setCreateForm(create_form) {
+        this.create_form = create_form
+        return this
+    }
+
+    setFolderId(folder_id) {
+        this.folder_id = folder_id
+        return this
+    }
+
+    setTotalReceiver(total_receiver) {
+        this.total_receiver = total_receiver
         return this
     }
 
@@ -129,58 +177,18 @@ const chat_class = class ChatClass {
         }
     }
 
-    async storeScheduleReceiver(results) {
-        const scheduleReceivers = []
-
-        results.forEach(async (result) => {
-            const message = { receiver: result.telp }
-
-            if (result.type === "text") {
-                message.message = {
-                    text: result.text
-                }
-            } else if (result.type === "image") {
-                message.message = {
-                    image: {
-                        url: result.url
-                    },
-                    caption: result.text
-                }
-            } else if (result.type === "document") {
-                message.message = {
-                    document: {
-                        url: result.url
-                    },
-                    mimetype: 'application/pdf',
-                    fileName: result.text
-                }
-            } else {
-                return console.error('Unknown Type:', result.type)
-            }
-            try {
-                const scheduleReceiver = await ScheduleReceiver.create({
-                    category: result.type,
-                    device_id: result.device_id,
-                    telp: result.telp,
-                    schedule_at: result.schedule_time,
-                    message, 
-                })
-                scheduleReceivers.push(scheduleReceiver)
-            } catch(err) {
-                console.log(err)
-                scheduleReceivers.push(err.message) // send error into the response
-            }
+    async storeScheduleReceiver() {
+        const { category, device_id, telp, schedule_at, message } = this
+        const ScheduleReceiver = await ScheduleReceiver.create({
+            category, device_id, telp, schedule_at, message 
         })
-
-        return scheduleReceivers
     }
 
-    async storeSchedule({ title, create_form, folder_id, total_receiver }) {
+    async storeSchedule() {
+        const { title, create_form, folder_id, total_receiver } = this
         const schedule = await Schedule.create({
             title, create_form, folder_id, total_receiver
         })
-
-        return schedule
     }
 }
 

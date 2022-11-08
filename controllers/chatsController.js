@@ -102,16 +102,51 @@ const storeSchedule = async (req, res) => {
       .on('data', (data) => {
         results.push(data)
     }).on('end', async () => {
-        const ChatClass = new chat_class()
-        const scheduleReceivers = await ChatClass.storeScheduleReceiver(results)
-        const schedule = await ChatClass.storeSchedule({
-            title: req.body.title,
-            create_form: req.body.create_form,
-            folder_id: req.body.folder_id,
-            total_receiver: scheduleReceivers.length,
+        results.forEach(async (result) => {
+            const message = { receiver: result.telp }
+
+            if (result.type === "text") {
+                message.message = {
+                    text: result.text
+                }
+            } else if (result.type === "image") {
+                message.message = {
+                    image: {
+                        url: result.url
+                    },
+                    caption: result.text
+                }
+            } else if (result.type === "document") {
+                message.message = {
+                    document: {
+                        url: result.url
+                    },
+                    mimetype: 'application/pdf',
+                    fileName: result.text
+                }
+            } else {
+                return console.error('Unknown Type:', result.type)
+            }
+            try {
+                await new chat_class()
+                  .setCategory(result.type)
+                  .setDeviceId(result.device_id)
+                  .setTelp(result.telp)
+                  .setScheduleAt(result.schedule_time)
+                  .setMessage(message)
+                  .storeScheduleReceiver()
+            } catch (err) {
+                console.log(err)
+            }
         })
+        const schedule = await new chat_class()
+            .setTitle(req.body.title)
+            .setCreateForm(req.body.create_form)
+            .setFolderId(req.body.folder_id)
+            .setTotalReceiver(/* 582 */)
+            .storeSchedule()
           
-        return res.send(schedules)
+        return res.send(schedule)
     })
 }
 
