@@ -1,5 +1,6 @@
 import { URL, parse } from 'url';
 import request from 'request';
+import { Schedule, ScheduleReceiver } from '../models/ApiModel';
 
 const chat_class = class ChatClass {
     constructor() {
@@ -108,11 +109,79 @@ const chat_class = class ChatClass {
         return true
     }
 
-    // showSchedule
+    async showSchedule() {
+        try {
+            const schedules = await Schedule.findAll()
 
-    // showDetailSchedule
+            return schedules
+        } catch(err) {
+            return err.message
+        }
+    }
 
-    // storeSchedule (jangan di bulk, di foreach di controller nya aja)
+    async showDetailSchedule(schedule_id) {
+        try {
+            const detailSchedule = await ScheduleReceiver.findAll({ where: { schedule_id } }) 
+            
+            return detailSchedule
+        } catch(err) {
+            return err.message
+        }
+    }
+
+    async storeScheduleReceiver(results) {
+        const scheduleReceivers = []
+
+        results.forEach(async (result) => {
+            const message = { receiver: result.telp }
+
+            if (result.type === "text") {
+                message.message = {
+                    text: result.text
+                }
+            } else if (result.type === "image") {
+                message.message = {
+                    image: {
+                        url: result.url
+                    },
+                    caption: result.text
+                }
+            } else if (result.type === "document") {
+                message.message = {
+                    document: {
+                        url: result.url
+                    },
+                    mimetype: 'application/pdf',
+                    fileName: result.text
+                }
+            } else {
+                return console.error('Unknown Type:', result.type)
+            }
+            try {
+                const scheduleReceiver = await ScheduleReceiver.create({
+                    category: result.type,
+                    device_id: result.device_id,
+                    telp: result.telp,
+                    schedule_at: result.schedule_time,
+                    message, 
+                })
+                scheduleReceivers.push(scheduleReceiver)
+            } catch(err) {
+                console.log(err)
+                scheduleReceivers.push(err.message) // send error into the response
+            }
+        })
+
+        return scheduleReceivers
+    }
+
+    async storeSchedule({ title, create_form, folder_id, total_receiver }) {
+        const schedule = await Schedule.create({
+            title, create_form, folder_id, total_receiver
+        })
+
+        return schedule
+    }
 }
 
 export default chat_class

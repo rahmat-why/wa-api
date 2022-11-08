@@ -5,6 +5,7 @@ import csv from 'csv-parser'
 import { getSession, getChatList, isExists, sendMessage, formatPhone } from './../whatsapp.js'
 import response from './../response.js'
 import { Schedule, ScheduleReceiver } from '../models/ApiModel.js'
+import chat_class from '../class/ChatClass.js'
 
 const getList = (req, res) => {
     return response(res, 200, true, '', getChatList(res.locals.sessionId))
@@ -80,14 +81,16 @@ const sendBulk = async (req, res) => {
 }
 
 const showSchedule = async (req, res) => {
-    const schedules = await Schedule.findAll()
+    const ChatClass = new chat_class()
+    const schedules = await ChatClass.showSchedule()
 
     return res.send(schedules)
 }
 
 const showDetailSchedule = async (req, res) => {
     const { schedule_id } = req.params
-    const detailSchedule = ScheduleReceiver.findAll({ where: { schedule_id } })
+    const ChatClass = new chat_class()
+    const detailSchedule = await ChatClass.showDetailSchedule(schedule_id)
 
     return res.send(detailSchedule)
 }
@@ -99,8 +102,15 @@ const storeSchedule = async (req, res) => {
       .on('data', (data) => {
         results.push(data)
     }).on('end', async () => {
-        console.log(JSON.stringify(results))
-        const schedules = await Schedule.bulkCreate(results, { individualHooks: true })
+        const ChatClass = new chat_class()
+        const scheduleReceivers = await ChatClass.storeScheduleReceiver(results)
+        const schedule = await ChatClass.storeSchedule({
+            title: req.body.title,
+            create_form: req.body.create_form,
+            folder_id: req.body.folder_id,
+            total_receiver: scheduleReceivers.length,
+        })
+          
         return res.send(schedules)
     })
 }
