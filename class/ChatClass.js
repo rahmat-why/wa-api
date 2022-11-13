@@ -1,8 +1,8 @@
 import { URL, parse } from 'url';
 import request from 'request';
-import { Schedule, ScheduleReceiver } from '../models/ApiModel';
+import { Schedule, ScheduleReceiver } from '../models/ApiModel.js';
 
-const chat_class = class ChatClass {
+const ChatClass = class ChatClass {
     constructor() {
         this.webhook = null,
         this.sessionId = null,
@@ -179,7 +179,7 @@ const chat_class = class ChatClass {
 
     async storeScheduleReceiver() {
         const { category, device_id, telp, schedule_at, message } = this
-        const ScheduleReceiver = await ScheduleReceiver.create({
+        await ScheduleReceiver.create({
             category, device_id, telp, schedule_at, message 
         })
     }
@@ -192,4 +192,4 @@ const chat_class = class ChatClass {
     }
 }
 
-export default chat_class
+export default ChatClass

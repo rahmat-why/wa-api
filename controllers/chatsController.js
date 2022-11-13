@@ -4,8 +4,7 @@ import { pipeline } from 'node:stream/promises'
 import csv from 'csv-parser'
 import { getSession, getChatList, isExists, sendMessage, formatPhone } from './../whatsapp.js'
 import response from './../response.js'
-import { Schedule, ScheduleReceiver } from '../models/ApiModel.js'
-import chat_class from '../class/ChatClass.js'
+import ChatClass from '../class/ChatClass.js'
 
 const getList = (req, res) => {
     return response(res, 200, true, '', getChatList(res.locals.sessionId))
@@ -81,18 +80,16 @@ const sendBulk = async (req, res) => {
 }
 
 const showSchedule = async (req, res) => {
-    const ChatClass = new chat_class()
-    const schedules = await ChatClass.showSchedule()
+    const schedules = await new ChatClass.showSchedule()
 
-    return res.send(schedules)
+    return response(res, 200, true, 'Schedule found!.', schedules)
 }
 
 const showDetailSchedule = async (req, res) => {
     const { schedule_id } = req.params
-    const ChatClass = new chat_class()
-    const detailSchedule = await ChatClass.showDetailSchedule(schedule_id)
+    const detailSchedule = await new ChatClass.showDetailSchedule(schedule_id)
 
-    return res.send(detailSchedule)
+    return response(res, 200, true, 'Detail schedule found!.', detailSchedule)
 }
 
 const storeSchedule = async (req, res) => {
@@ -103,7 +100,7 @@ const storeSchedule = async (req, res) => {
         results.push(data)
     }).on('end', async () => {
         results.forEach(async (result) => {
-            const message = { receiver: result.telp }
+            var message = { receiver: result.telp }
 
             if (result.type === "text") {
                 message.message = {
@@ -128,25 +125,25 @@ const storeSchedule = async (req, res) => {
                 return console.error('Unknown Type:', result.type)
             }
             try {
-                await new chat_class()
+                await new ChatClass()
                   .setCategory(result.type)
                   .setDeviceId(result.device_id)
                   .setTelp(result.telp)
                   .setScheduleAt(result.schedule_time)
-                  .setMessage(message)
+                  .setMessage(JSON.stringify(message))
                   .storeScheduleReceiver()
             } catch (err) {
                 console.log(err)
             }
         })
-        const schedule = await new chat_class()
+        const schedule = await new ChatClass()
             .setTitle(req.body.title)
             .setCreateForm(req.body.create_form)
             .setFolderId(req.body.folder_id)
             .setTotalReceiver(/* 582 */)
             .storeSchedule()
           
-        return res.send(schedule)
+        return response(res, 200, true, 'Detail schedule found!.', {})
     })
 }
 
