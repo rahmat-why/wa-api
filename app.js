@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import './config/mdb.js'
 import express from 'express'
 import nodeCleanup from 'node-cleanup'
 import routes from './routes.js'
