@@ -1,6 +1,6 @@
 import { URL, parse } from 'url';
 import request from 'request';
-import { Schedule, ScheduleReceiver } from '../models/ApiModel.js';
+import { Schedule, ScheduleReceiver } from '../models/ScheduleModel.js';
 
 const ChatClass = class ChatClass {
     constructor() {
@@ -158,18 +158,15 @@ const ChatClass = class ChatClass {
     }
 
     async showSchedule() {
-        try {
-            const schedules = await Schedule.findAll()
-
-            return schedules
-        } catch(err) {
-            return err.message
-        }
+        const schedules = await Schedule.find()
+        return schedules
     }
 
     async showDetailSchedule(schedule_id) {
         try {
-            const detailSchedule = await ScheduleReceiver.findAll({ where: { schedule_id } }) 
+            const detailSchedule = await ScheduleReceiver.find({ 
+              scheduleId: schedule_id 
+            }) 
             
             return detailSchedule
         } catch(err) {
@@ -179,16 +176,27 @@ const ChatClass = class ChatClass {
 
     async storeScheduleReceiver() {
         const { category, device_id, telp, schedule_at, message } = this
-        await ScheduleReceiver.create({
-            category, device_id, telp, schedule_at, message 
+
+        await new ScheduleReceiver({
+          category,
+          deviceId: device_id,
+          telp,
+          scheduleTime: schedule_at,
+          message
         })
+        .save()
     }
 
     async storeSchedule() {
         const { title, create_form, folder_id, total_receiver } = this
-        const schedule = await Schedule.create({
-            title, create_form, folder_id, total_receiver
+        
+        await new Schedule({
+          title,
+          createFrom: create_form,
+          folderId: folder_id,
+          totalReceiver: total_receiver
         })
+        .save()
     }
 }
 

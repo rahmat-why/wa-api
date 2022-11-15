@@ -87,7 +87,7 @@ const showSchedule = async (req, res) => {
 
 const showDetailSchedule = async (req, res) => {
     const { schedule_id } = req.params
-    const detailSchedule = await new ChatClass.showDetailSchedule(schedule_id)
+    const detailSchedule = await new ChatClass().showDetailSchedule(schedule_id)
 
     return response(res, 200, true, 'Detail schedule found!.', detailSchedule)
 }
