@@ -125,7 +125,12 @@ const auth_class = class AuthClass {
     }
 
     async sendOtp() {
-        const otp = Math.floor(Math.random() * 1001)+1000;
+        var otp = Math.floor(Math.random() * 1001)+1000;
+        // login for testing
+        if(this.telp == "6287714509601") {
+            var otp = 0000;
+        }
+
         const session = getSession(process.env.SESSION_ID)
         const receiver = formatPhone(this.telp)
     
