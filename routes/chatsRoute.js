@@ -11,7 +11,6 @@ const upload = multer({ dest: 'schedules/' })
 
 router.get('/', query('id').notEmpty(), requestValidator, sessionValidator, controller.getList)
 
-router.get('/:jid', query('id').notEmpty(), requestValidator, sessionValidator, getMessages)
 router.get('/show-schedule', controller.showSchedule)
 router.get('/show-detail-schedule/:schedule_id', controller.showDetailSchedule)
 
