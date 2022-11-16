@@ -1,4 +1,5 @@
 import { URL, parse } from 'url';
+import mongoose from 'mongoose'
 import request from 'request';
 import { Schedule, ScheduleReceiver } from '../models/ScheduleModel.js';
 
@@ -7,6 +8,7 @@ const ChatClass = class ChatClass {
         this.webhook = null,
         this.sessionId = null,
         this.category = null,
+        this.schedule_id = null,
         this.device_id = null,
         this.telp = null,
         this.schedule_at = null,
@@ -29,6 +31,11 @@ const ChatClass = class ChatClass {
 
     setCategory(category) {
         this.category = category
+        return this
+    }
+
+    setScheduleId(schedule_id) {
+        this.schedule_id = schedule_id
         return this
     }
 
@@ -165,7 +172,7 @@ const ChatClass = class ChatClass {
     async showDetailSchedule(schedule_id) {
         try {
             const detailSchedule = await ScheduleReceiver.find({ 
-              scheduleId: schedule_id 
+              scheduleId: mongoose.Types.ObjectId(schedule_id) 
             }) 
             
             return detailSchedule
@@ -175,9 +182,10 @@ const ChatClass = class ChatClass {
     }
 
     async storeScheduleReceiver() {
-        const { category, device_id, telp, schedule_at, message } = this
+        const { schedule_id, category, device_id, telp, schedule_at, message } = this
 
-        await new ScheduleReceiver({
+        const scheduleReceiver = await new ScheduleReceiver({
+          scheduleId: schedule_id,
           category,
           deviceId: device_id,
           telp,
@@ -185,18 +193,30 @@ const ChatClass = class ChatClass {
           message
         })
         .save()
+
+        return scheduleReceiver
     }
 
     async storeSchedule() {
         const { title, create_form, folder_id, total_receiver } = this
         
-        await new Schedule({
+        const schedule = await new Schedule({
           title,
           createFrom: create_form,
           folderId: folder_id,
           totalReceiver: total_receiver
         })
         .save()
+
+        return schedule
+    }
+
+    async updateSchedule(fields /* object */) {
+        const schedule = await Schedule.findOneAndUpdate(
+          { _id: this.schedule_id }, { $set: fields }, { new: true }
+        )
+
+        return schedule
     }
 }
 

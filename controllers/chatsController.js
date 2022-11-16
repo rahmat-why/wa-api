@@ -5,6 +5,7 @@ import csv from 'csv-parser'
 import { getSession, getChatList, isExists, sendMessage, formatPhone } from './../whatsapp.js'
 import response from './../response.js'
 import ChatClass from '../class/ChatClass.js'
+import DeviceClass from '../class/DeviceClass.js'
 
 const getList = (req, res) => {
     return response(res, 200, true, '', getChatList(res.locals.sessionId))
@@ -80,7 +81,7 @@ const sendBulk = async (req, res) => {
 }
 
 const showSchedule = async (req, res) => {
-    const schedules = await new ChatClass.showSchedule()
+    const schedules = await new ChatClass().showSchedule()
 
     return response(res, 200, true, 'Schedule found!.', schedules)
 }
@@ -93,13 +94,29 @@ const showDetailSchedule = async (req, res) => {
 }
 
 const storeSchedule = async (req, res) => {
+    const schedule = await new ChatClass()
+        .setTitle(req.body.title)
+        .setCreateForm(req.body.create_form)
+        .setFolderId(req.body.folder_id)
+        .storeSchedule()
+
     const csvFilePath = join(process.cwd(), req.file.path)
     const results = []
+    var totalReceiver = 0
+
     createReadStream(csvFilePath).pipe(csv())
       .on('data', (data) => {
         results.push(data)
-    }).on('end', async () => {
-        results.forEach(async (result) => {
+      })
+      .on('end', async () => {
+        for (const result of results) {
+            const validWhatsappNumber = await new DeviceClass()
+                .setTelp(result.telp)
+                .isValidWhatsappNumber()
+
+            if (!validWhatsappNumber) {
+                continue
+            }
             var message = { receiver: result.telp }
 
             if (result.type === "text") {
@@ -126,24 +143,24 @@ const storeSchedule = async (req, res) => {
             }
             try {
                 await new ChatClass()
+                  .setScheduleId(schedule._id)
                   .setCategory(result.type)
                   .setDeviceId(result.device_id)
                   .setTelp(result.telp)
                   .setScheduleAt(result.schedule_time)
                   .setMessage(JSON.stringify(message))
                   .storeScheduleReceiver()
+
+                totalReceiver++
             } catch (err) {
                 console.log(err)
             }
-        })
-        const schedule = await new ChatClass()
-            .setTitle(req.body.title)
-            .setCreateForm(req.body.create_form)
-            .setFolderId(req.body.folder_id)
-            .setTotalReceiver(/* 582 */)
-            .storeSchedule()
-          
-        return response(res, 200, true, 'Detail schedule found!.', {})
+        }
+        const updatedSchedule = await new ChatClass()
+            .setScheduleId(schedule._id)
+            .updateSchedule({ totalReceiver })
+     
+        return response(res, 200, true, 'Schedule created successfully!.', updatedSchedule)
     })
 }
 

@@ -4,7 +4,7 @@ const { Schema, model } = mongoose
 
 const scheduleSchema = new Schema({
   title: String,
-  totalReceiver: String,
+  totalReceiver: Number,
   userId: Number,
   createFrom: String,
   folderId: String
