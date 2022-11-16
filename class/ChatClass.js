@@ -117,7 +117,7 @@ const chat_class = class ChatClass {
             'method': 'POST',
             'url': 'https://newsweather.angel-ping.my.id/create',
             'headers': {
-                'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiUmFobWF0IFdhaHl1IiwicGFzc3dvcmQiOiIxMjMiLCJpYXQiOjE2NjY3Nzk5NDd9.dqpujgqEuyICqGAbJdj9nY2dtD63rymiY_en50a5CuQ',
+                'x-access-token': PROCESS.env.LOG_TOKEN,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(this.response)
