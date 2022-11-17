@@ -95,82 +95,89 @@ const createSession = async (sessionId, isLegacy = false, res = null) => {
 
     // Automatically read incoming messages, uncomment below codes to enable this behaviour
     wa.ev.on('messages.upsert', async (m) => {
-        const message = m.messages[0]
-        console.log(JSON.stringify(message))
-        if(m.type != 'notify') {
-            return false
-        }
+        try{
+            const message = m.messages[0]
+        
+            console.log(JSON.stringify([message, m.type]))
 
-        var remote = message.key.remoteJid.split("@")[1]
-        var valid_remote = ["s.whatsapp.net", "g.us"]
-        if (!valid_remote.includes(remote)) {
-            return false
-        }
-
-        if(remote === "s.whatsapp.net"){
-            var formatted_response_chat = 
-                await new ChatClass()
-                .setSessionId(sessionId)
-                .setMessage(message)
-                .formatWebhookChat()
-
-            var store_log = 
-                await new ChatClass()
-                .setResponse(formatted_response_chat)
-                .storeLog()
-        }else if(remote === "g.us"){
-            var formatted_response_chat = 
-                await new ChatClass()
-                .setSessionId(sessionId)
-                .setMessage(message)
-                .formatWebhookGroup()
-
-            var store_log = 
-                await new ChatClass()
-                .setResponse(formatted_response_chat)
-                .storeLog()
-        }
-
-        if (!message.key.fromMe) {
-            await delay(1000)
-
-            let device = 
-                await new DeviceClass()
-                .setDeviceId(sessionId)
-                .getDevice()
-
-            if (device === null) {
+            const valid_types = ["notify", "append"]
+            if(!valid_types.includes(m.type)) {
                 return false
             }
 
-            if (remote === "s.whatsapp.net") {
-                if (device.webhook === null) {
-                    return false
-                }
+            var remote = message.key.remoteJid.split("@")[1]
+            var valid_remote = ["s.whatsapp.net"] // deleted: "g.us"
+            if (!valid_remote.includes(remote)) {
+                return false
+            }
 
-                var call_webhook = 
+            if(remote === "s.whatsapp.net"){
+                var formatted_response_chat = 
+                    await new ChatClass()
+                    .setSessionId(sessionId)
+                    .setMessage(message)
+                    .formatWebhookChat()
+
+                var store_log = 
                     await new ChatClass()
                     .setResponse(formatted_response_chat)
-                    .setWebhook(device.webhook)
-                    .callWebhook()
-                    
+                    .storeLog()
             }else if(remote === "g.us"){
-                if (device.webhook_group === null) {
+                var formatted_response_chat = 
+                    await new ChatClass()
+                    .setSessionId(sessionId)
+                    .setMessage(message)
+                    .formatWebhookGroup()
+
+                var store_log = 
+                    await new ChatClass()
+                    .setResponse(formatted_response_chat)
+                    .storeLog()
+            }
+
+            if (!message.key.fromMe) {
+                await delay(1000)
+
+                let device = 
+                    await new DeviceClass()
+                    .setDeviceId(sessionId)
+                    .getDevice()
+
+                if (device === null) {
                     return false
                 }
 
-                var call_webhook = 
-                    await new ChatClass()
-                    .setResponse(formatted_response_chat)
-                    .setWebhook(device.webhook)
-                    .callWebhook()
-            }
+                if (remote === "s.whatsapp.net") {
+                    if (device.webhook === null) {
+                        return false
+                    }
 
-            if (isLegacy) {
-                await wa.chatRead(message.key, 1)
-            } else {
-                await wa.sendReadReceipt(message.key.remoteJid, message.key.participant, [message.key.id])
-            }
+                    var call_webhook = 
+                        await new ChatClass()
+                        .setResponse(formatted_response_chat)
+                        .setWebhook(device.webhook)
+                        .callWebhook()
+                        
+                }else if(remote === "g.us"){
+                    if (device.webhook_group === null) {
+                        return false
+                    }
+
+                    var call_webhook = 
+                        await new ChatClass()
+                        .setResponse(formatted_response_chat)
+                        .setWebhook(device.webhook)
+                        .callWebhook()
+                }
+
+                if (isLegacy) {
+                    await wa.chatRead(message.key, 1)
+                } else {
+                    await wa.sendReadReceipt(message.key.remoteJid, message.key.participant, [message.key.id])
+                }
+            }   
+        } catch (err) {
+            console.log(err.message)
         }
     })
 
@@ -280,6 +287,16 @@ const isExists = async (session, jid, isGroup = false) => {
 const sendMessage = async (session, receiver, message, delayMs = 1000) => {
     try {
         await delay(parseInt(delayMs))
+
+        // store log
+        // var key = {
+        //     id: "2F048A7D767EBA95E01017431E09893E",
+        //     sessionId: "DEVICE43100",
+        //     telp: "6281298814716@s.whatsapp.net",
+        //     name: "Dapi",
+        //     message: "Cape",
+        //     fromMe: false
+        // }
 
         return session.sendMessage(receiver, message)
     } catch {
