@@ -139,7 +139,8 @@ const storeSchedule = async (req, res) => {
                     fileName: result.text
                 }
             } else {
-                return console.error('Unknown Type:', result.type)
+                console.error('Unknown Type:', result.type)
+                continue
             }
             try {
                 await new ChatClass()
