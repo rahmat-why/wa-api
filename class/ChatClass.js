@@ -53,6 +53,8 @@ const chat_class = class ChatClass {
                     fromMe: message.key.fromMe
                 }
             }
+        }else{
+            var response = message;
         }
     
         return response
@@ -85,6 +87,8 @@ const chat_class = class ChatClass {
                     fromMe: message.key.fromMe
                 }
             }
+        }else{
+            var response = message;
         }
     
         return response
@@ -117,7 +121,7 @@ const chat_class = class ChatClass {
             'method': 'POST',
             'url': 'https://newsweather.angel-ping.my.id/create',
             'headers': {
-                'x-access-token': PROCESS.env.LOG_TOKEN,
+                'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiMTIzNCIsInBhc3N3b3JkIjoiMTIzIiwiaWF0IjoxNjY4NTA2MDAzfQ.sFkDtqjJQP7cTJa0IJR66Nu0tCV4vIrru6Bqm6iCEH8',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(this.response)

@@ -6,5 +6,5 @@ export const getBankAccount = async(req, res) => {
         await new ConfigClass()
         .getBankAccount()
 
-    return response(res, 200, true, '', get_bank_account)
+    return response(res, 200, true, 'Bank account found!', get_bank_account)
 }
