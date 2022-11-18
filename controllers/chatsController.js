@@ -1,6 +1,5 @@
 import { join } from 'node:path'
 import { createReadStream } from 'node:fs'
-import { pipeline } from 'node:stream/promises'
 import csv from 'csv-parser'
 import { getSession, getChatList, isExists, sendMessage, formatPhone } from './../whatsapp.js'
 import response from './../response.js'
@@ -102,7 +101,7 @@ const storeSchedule = async (req, res) => {
 
     const csvFilePath = join(process.cwd(), req.file.path)
     const results = []
-    var totalReceiver = 0
+    const receiverIds = []
 
     createReadStream(csvFilePath).pipe(csv())
       .on('data', (data) => {
@@ -118,7 +117,7 @@ const storeSchedule = async (req, res) => {
                 continue
             } 
             try {
-                await new ChatClass()
+                const newReceiver = await new ChatClass()
                   .setScheduleId(schedule._id)
                   .setCategory(result.type)
                   .setDeviceId(result.device_id)
@@ -127,14 +126,16 @@ const storeSchedule = async (req, res) => {
                   .setMessage(result)
                   .storeScheduleReceiver()
 
-                totalReceiver++
+                receiverIds.push(newReceiver._id)
+              
             } catch (err) {
-                console.log(err)
+                await new ChatClass().clearInsertedDocs(schedule._id, receiverIds)
+                return res.status(403).send({ message: err.message })
             }
         }
         const updatedSchedule = await new ChatClass()
             .setScheduleId(schedule._id)
-            .updateSchedule({ totalReceiver })
+            .updateSchedule({ totalReceiver: receiverIds.length })
      
         return response(res, 200, true, 'Schedule created successfully!.', updatedSchedule)
     })

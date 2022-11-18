@@ -243,6 +243,11 @@ const ChatClass = class ChatClass {
 
         return schedule
     }
+
+    async clearInsertedDocs(scheduleId, receiverIds) {
+        await Schedule.deleteOne({ _id: scheduleId })
+        await ScheduleReceiver.deleteMany({ _id: { $in: receiverIds }})
+    }
 }
 
 export default ChatClass
