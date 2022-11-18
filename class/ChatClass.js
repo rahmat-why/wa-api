@@ -54,8 +54,33 @@ const ChatClass = class ChatClass {
         return this
     }
 
-    setMessage(message) {
-        this.message = message
+    setMessage(doc /* object */) {
+        this.message = { receiver: doc.telp }
+
+        if (doc.type === "text") {
+          this.message.message = {
+            text: doc.text
+          }
+        } else if (doc.type === "image") {
+          this.message.message = {
+            image: {
+              url: doc.url
+            },
+            caption: doc.text
+          }
+        } else if (doc.type === "document") {
+          this.message.message = {
+            document: {
+              url: doc.url
+            },
+            mimetype: 'application/pdf',
+            fileName: doc.text
+          }
+        } else {
+          throw new Error('Unknown Type: ' + doc.type)
+        }
+        this.message = JSON.stringify(this.message)
+
         return this
     }
 

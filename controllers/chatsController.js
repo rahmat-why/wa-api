@@ -116,32 +116,7 @@ const storeSchedule = async (req, res) => {
 
             if (!validWhatsappNumber) {
                 continue
-            }
-            var message = { receiver: result.telp }
-
-            if (result.type === "text") {
-                message.message = {
-                    text: result.text
-                }
-            } else if (result.type === "image") {
-                message.message = {
-                    image: {
-                        url: result.url
-                    },
-                    caption: result.text
-                }
-            } else if (result.type === "document") {
-                message.message = {
-                    document: {
-                        url: result.url
-                    },
-                    mimetype: 'application/pdf',
-                    fileName: result.text
-                }
-            } else {
-                console.error('Unknown Type:', result.type)
-                continue
-            }
+            } 
             try {
                 await new ChatClass()
                   .setScheduleId(schedule._id)
@@ -149,7 +124,7 @@ const storeSchedule = async (req, res) => {
                   .setDeviceId(result.device_id)
                   .setTelp(result.telp)
                   .setScheduleAt(result.schedule_time)
-                  .setMessage(JSON.stringify(message))
+                  .setMessage(result)
                   .storeScheduleReceiver()
 
                 totalReceiver++
