@@ -2,7 +2,7 @@ import {
     Device
 } from './../models/ApiModel.js'
 import { URL, parse } from 'url';
-import request from 'request';
+import axios from 'axios';
 import date from 'date-and-time';
 import AuthClass from './../class/AuthClass.js'
 import { getSession, getChatList, isExists, sendMessage, formatPhone } from './../whatsapp.js'
@@ -158,23 +158,21 @@ const device_class = class DeviceClass {
     }
 
     async isValidWhatsappNumber() {
-        var options = {
-            'method': 'POST',
-            'url': 'https://portal.angel-ping.my.id/chats/check-number',
-            'headers': {
-                'angel-key': 'ECOM.c9dc7e39c892544e816',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
+        try{
+            const response = await axios.post('https://portal.angel-ping.my.id/chats/check-number', {
                 "receiver": this.telp
-            })
-          
-        };
-            
-        request(options, function (error, response) {
-            if (error) throw new Error(error);
-            return JSON.parse(response.body).success
-        });
+            },{
+                headers: {
+                    'angel-key': 'ECOM.c9dc7e39c892544e816',
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            return response.data.success
+        }
+        catch (err){
+            return false
+        }
     }
     
     isValidUrl() {
