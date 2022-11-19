@@ -13,6 +13,7 @@ router.get('/', query('id').notEmpty(), requestValidator, sessionValidator, cont
 
 router.get('/show-schedule', controller.showSchedule)
 router.get('/show-detail-schedule/:schedule_id', controller.showDetailSchedule)
+router.get('/show-contact/:folder_id', controller.showContact)
 
 router.post(
     '/send',
@@ -25,5 +26,6 @@ router.post(
 
 router.post('/send-bulk', query('id').notEmpty(), requestValidator, sessionValidator, controller.sendBulk)
 router.post('/store-schedule', upload.single('template'), controller.storeSchedule)
+router.post('/store-contact', upload.single('template'), controller.storeContact)
 
 export default router
