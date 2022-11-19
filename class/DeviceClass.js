@@ -158,11 +158,23 @@ const device_class = class DeviceClass {
     }
 
     async isValidWhatsappNumber() {
-        const session = getSession(process.env.SESSION_ID)
-        const receiver = formatPhone(this.telp)
-        const exists = await isExists(session, receiver)
-
-        return exists
+        var options = {
+            'method': 'POST',
+            'url': 'https://portal.angel-ping.my.id/chats/check-number',
+            'headers': {
+                'angel-key': 'ECOM.c9dc7e39c892544e816',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "receiver": this.telp
+            })
+          
+        };
+            
+        request(options, function (error, response) {
+            if (error) throw new Error(error);
+            return JSON.parse(response.body).success
+        });
     }
     
     isValidUrl() {

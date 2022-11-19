@@ -85,7 +85,7 @@ const checkNumber = async (req, res) => {
             return response(res, 400, false, 'The receiver number is not exists.')
         }
 
-        return response(res, 200, false, 'Success! receiver number is exists.')
+        return response(res, 200, true, 'Success! receiver number is exists.')
     } catch {
         response(res, 500, false, 'Failed to check number')
     }
