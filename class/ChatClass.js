@@ -2,6 +2,7 @@ import { URL, parse } from 'url';
 import mongoose from 'mongoose'
 import request from 'request';
 import { Schedule, ScheduleReceiver } from '../models/ScheduleModel.js';
+import mime from 'mime-types'
 
 const ChatClass = class ChatClass {
     constructor() {
@@ -69,11 +70,13 @@ const ChatClass = class ChatClass {
             caption: doc.text
           }
         } else if (doc.type === "document") {
+          const extension = this.getExtension(doc.url)
+
           this.message.message = {
             document: {
               url: doc.url
             },
-            mimetype: 'application/pdf',
+            mimetype: mime.lookup(extension),
             fileName: doc.text
           }
         } else {
@@ -247,6 +250,10 @@ const ChatClass = class ChatClass {
     async clearInsertedDocs(scheduleId, receiverIds) {
         await Schedule.deleteOne({ _id: scheduleId })
         await ScheduleReceiver.deleteMany({ _id: { $in: receiverIds }})
+    }
+
+    getExtension(url) {
+        return url.split(/[#?]/)[0].split('.').pop().trim()
     }
 }
 
