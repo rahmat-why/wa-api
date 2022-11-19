@@ -141,4 +141,57 @@ const storeSchedule = async (req, res) => {
     })
 }
 
-export { getList, send, sendBulk, showSchedule, showDetailSchedule, storeSchedule }
+const showContact = async (req, res) => {
+    try {
+      const contacts = await new ChatClass().setFolderId(req.params.folder_id).showContact()
+      return res.send(contacts)
+    } catch (err) {
+      return res.status(403).send({ message: err.message })
+    }
+}
+
+const storeContact = async (req, res) => {
+  const csvFilePath = join(process.cwd(), req.file.path)
+  const results = []
+  const contacts = []
+
+  createReadStream(csvFilePath).pipe(csv())
+    .on('data', (data) => {
+      results.push(data)
+    })
+    .on('end', async () => {
+      try {
+        for (const result of results) {
+          var contact = new ChatClass()
+            .setTelp(result.telp)
+            .setName(result.name)
+            .setProfilePicture(result.profile_picture)
+            .setFolderId(req.body.folder_id)
+          
+          const oldContact = await contact.findContact()
+
+          if (oldContact) {
+            if (!oldContact.folder_ids.includes(contact.folder_id)) {
+              contact = await contact.addContactFolder()
+            }
+            else {
+              contact = oldContact
+            }
+          }
+          else {
+            contact = await contact.storeContact()
+          }
+          contacts.push(contact)
+        }
+        return res.send(contacts)
+
+      } catch (err) {
+        return res.status(403).send({ message: err.message })
+      }
+    })
+    .on('error', (err) => {
+      return res.status(403).send({ message: err.message })
+    })
+}
+
+export { getList, send, sendBulk, showSchedule, showDetailSchedule, storeSchedule, showContact, storeContact }

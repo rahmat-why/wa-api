@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 import request from 'request';
 import { Schedule, ScheduleReceiver } from '../models/ScheduleModel.js';
 import mime from 'mime-types'
+import { Contact } from '../models/ContactModel.js';
 
 const ChatClass = class ChatClass {
     constructor() {
@@ -17,7 +18,9 @@ const ChatClass = class ChatClass {
         this.title = null,
         this.create_form = null,
         this.folder_id = null,
-        this.total_receiver = null
+        this.total_receiver = null,
+        this.name = null
+        this.profile_picture = null
     }
 
     setWebhook(webhook) {
@@ -109,6 +112,16 @@ const ChatClass = class ChatClass {
 
     setTotalReceiver(total_receiver) {
         this.total_receiver = total_receiver
+        return this
+    }
+
+    setName(name) {
+        this.name = name
+        return this
+    }
+
+    setProfilePicture(profile_picture) {
+        this.profile_picture = profile_picture
         return this
     }
 
@@ -254,6 +267,38 @@ const ChatClass = class ChatClass {
 
     getExtension(url) {
         return url.split(/[#?]/)[0].split('.').pop().trim()
+    }
+
+    async showContact() {
+        const contacts = await Contact.find({ folder_ids: { $in: this.folder_id }})
+        return contacts
+    }  
+
+    async findContact() {
+        const contact = await Contact.findOne({ telp: this.telp })
+        return contact
+    }
+
+    async storeContact() {
+        const contact = await new Contact({
+          telp: this.telp,
+          name: this.name,
+          profile_picture: this.profile_picture,
+          folder_ids: [this.folder_id]
+        })
+        .save()
+
+        return contact
+    }
+
+    async addContactFolder() {
+        const contact = await Contact.findOneAndUpdate(
+          { telp: this.telp },
+          { $push: { folder_ids: this.folder_id }},
+          { new: true }
+        )
+
+        return contact
     }
 }
 
