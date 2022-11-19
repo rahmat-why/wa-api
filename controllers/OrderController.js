@@ -1,6 +1,7 @@
 import response from './../response.js'
 import OrderClass from './../class/OrderClass.js'
 import DeviceClass from './../class/DeviceClass.js'
+import ConfigClass from './../class/ConfigClass.js'
 
 export const showProduct = async(req, res) => {
 
@@ -11,6 +12,11 @@ export const showProduct = async(req, res) => {
 
         return response(res, 200, true, 'List product found!', show_product)
     } catch (err) {
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+
         return response(res, 500, false, err.message, {})
     }
 }
@@ -30,6 +36,11 @@ export const getProduct = async(req, res) => {
 
         return response(res, 200, true, 'Product found!', get_product)
     } catch (err) {
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+
         return response(res, 500, false, err.message, {})
     }
 }
@@ -45,6 +56,11 @@ export const getOrder = async(req, res) => {
 
         return response(res, 200, true, 'Order found!', get_order)
     } catch (err) {
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+
         return response(res, 500, false, err.message, {})
     }
 }
@@ -79,6 +95,11 @@ export const storeOrder = async(req, res) => {
 
         return response(res, 200, true, 'Order success!', store_order)
     } catch (err) {
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+
         return response(res, 500, false, err.message, {})
     }
 }
@@ -103,6 +124,11 @@ export const acceptOrder = async(req, res) => {
 
         return response(res, 200, true, 'Order accepted!', {})
     } catch (err) {
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+
         return response(res, 500, false, err.message, {})
     }
 }
@@ -127,6 +153,11 @@ export const rollbackAcceptOrder = async(req, res) => {
 
         return response(res, 200, true, 'Rollback order successfully!', {})
     } catch (err) {
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+
         return response(res, 500, false, err.message, {})
     }
 }

@@ -1,6 +1,7 @@
 import response from './../response.js'
 import AuthClass from './../class/AuthClass.js'
 import DeviceClass from './../class/DeviceClass.js'
+import ConfigClass from './../class/ConfigClass.js'
 
 export const getUser = async(req, res) => {
     try {
@@ -18,6 +19,11 @@ export const getUser = async(req, res) => {
         
         return response(res, 200, true, "user found!", get_user)
     } catch (err) {
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+
         return response(res, 500, false, err.message, {})
     }
 }
@@ -61,6 +67,11 @@ export const register = async(req, res) => {
 
         return response(res, 200, true, 'OTP sent successfully via Whatsapp!', {})
     } catch (err) {
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+
         return response(res, 500, false, err.message, {})
     }
 }
@@ -89,6 +100,11 @@ export const login = async(req, res) => {
 
         return response(res, 200, true, 'Login success! OTP sent successfully via Whatsapp!', {})
     } catch (err) {
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+
         return response(res, 500, false, err.message, {})
     }
 }
@@ -122,6 +138,11 @@ export const verifyOtp = async(req, res) => {
 
         return response(res, 200, true, 'OTP verified!', generate_token)
     } catch (err) {
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+
         return response(res, 500, false, err.message, {})
     }
 }

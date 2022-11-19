@@ -19,6 +19,7 @@ import { URL, parse } from 'url';
 
 import ChatClass from './class/ChatClass.js'
 import DeviceClass from './class/DeviceClass.js'
+import ConfigClass from './class/ConfigClass.js'
 
 const sessions = new Map()
 const retries = new Map()
@@ -177,7 +178,10 @@ const createSession = async (sessionId, isLegacy = false, res = null) => {
                 }
             }   
         } catch (err) {
-            console.log(err.message)
+            let notification_error = 
+                await new ConfigClass()
+                .setErrorMessage(err.message)
+                .notificationError()
         }
     })
 

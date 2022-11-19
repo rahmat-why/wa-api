@@ -1,5 +1,6 @@
 import { URL, parse } from 'url';
 import request from 'request';
+import ConfigClass from './../class/ConfigClass.js'
 
 const chat_class = class ChatClass {
     constructor() {
@@ -110,6 +111,11 @@ const chat_class = class ChatClass {
                 console.log(response.body);
             });
         } catch (err) {
+            let notification_error = 
+                await new ConfigClass()
+                .setErrorMessage(err.message)
+                .notificationError()
+                
             return err.message
         }
 
