@@ -74,4 +74,22 @@ const sendBulk = async (req, res) => {
     )
 }
 
-export { getList, send, sendBulk }
+const checkNumber = async (req, res) => {
+    const session = getSession(process.env.SESSION_ID)
+    const receiver = formatPhone(req.body.receiver)
+
+    try {
+        const exists = await isExists(session, receiver)
+
+        if (!exists) {
+            return response(res, 400, false, 'The receiver number is not exists.')
+        }
+
+        return response(res, 200, false, 'Success! receiver number is exists.')
+    } catch {
+        response(res, 500, false, 'Failed to check number')
+    }
+
+}
+
+export { getList, send, sendBulk, checkNumber }
