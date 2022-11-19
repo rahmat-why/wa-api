@@ -295,7 +295,7 @@ const cleanup = () => {
             session.store.writeToFile(sessionsDir(`${sessionId}_store.json`))
         }
     })
-    rmSync('./schedules/', { recursive: true, force: true })
+    rmSync('./csv/', { recursive: true, force: true })
 }
 
 const init = () => {

@@ -7,7 +7,7 @@ import * as controller from './../controllers/chatsController.js'
 import getMessages from './../controllers/getMessages.js'
 
 const router = Router()
-const upload = multer({ dest: 'schedules/' })
+const upload = multer({ dest: 'csv/' })
 
 router.get('/', query('id').notEmpty(), requestValidator, sessionValidator, controller.getList)
 
