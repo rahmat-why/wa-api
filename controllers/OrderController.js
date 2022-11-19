@@ -11,7 +11,7 @@ export const showProduct = async(req, res) => {
 
         return response(res, 200, true, 'List product found!', show_product)
     } catch (err) {
-        return response(res, 401, true, err.message, {})
+        return response(res, 500, false, err.message, {})
     }
 }
 
@@ -30,7 +30,7 @@ export const getProduct = async(req, res) => {
 
         return response(res, 200, true, 'Product found!', get_product)
     } catch (err) {
-        return response(res, 401, true, err.message, {})
+        return response(res, 500, false, err.message, {})
     }
 }
 
@@ -45,7 +45,7 @@ export const getOrder = async(req, res) => {
 
         return response(res, 200, true, 'Order found!', get_order)
     } catch (err) {
-        return response(res, 401, true, err.message, {})
+        return response(res, 500, false, err.message, {})
     }
 }
 
@@ -79,7 +79,7 @@ export const storeOrder = async(req, res) => {
 
         return response(res, 200, true, 'Order success!', store_order)
     } catch (err) {
-        return response(res, 401, true, err.message, {})
+        return response(res, 500, false, err.message, {})
     }
 }
 
@@ -103,7 +103,7 @@ export const acceptOrder = async(req, res) => {
 
         return response(res, 200, true, 'Order accepted!', {})
     } catch (err) {
-        return response(res, 401, true, err.message, {})
+        return response(res, 500, false, err.message, {})
     }
 }
 
@@ -127,6 +127,6 @@ export const rollbackAcceptOrder = async(req, res) => {
 
         return response(res, 200, true, 'Rollback order successfully!', {})
     } catch (err) {
-        return response(res, 401, true, err.message, {})
+        return response(res, 500, false, err.message, {})
     }
 }

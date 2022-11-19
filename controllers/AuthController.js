@@ -18,7 +18,7 @@ export const getUser = async(req, res) => {
         
         return response(res, 200, true, "user found!", get_user)
     } catch (err) {
-        return response(res, 401, true, err.message, {})
+        return response(res, 500, false, err.message, {})
     }
 }
 
@@ -61,7 +61,7 @@ export const register = async(req, res) => {
 
         return response(res, 200, true, 'OTP sent successfully via Whatsapp!', {})
     } catch (err) {
-        return response(res, 401, true, err.message, {})
+        return response(res, 500, false, err.message, {})
     }
 }
 
@@ -89,7 +89,7 @@ export const login = async(req, res) => {
 
         return response(res, 200, true, 'Login success! OTP sent successfully via Whatsapp!', {})
     } catch (err) {
-        return response(res, 401, true, err.message, {})
+        return response(res, 500, false, err.message, {})
     }
 }
 
@@ -122,6 +122,6 @@ export const verifyOtp = async(req, res) => {
 
         return response(res, 200, true, 'OTP verified!', generate_token)
     } catch (err) {
-        return response(res, 401, true, err.message, {})
+        return response(res, 500, false, err.message, {})
     }
 }
