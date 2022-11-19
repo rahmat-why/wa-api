@@ -102,7 +102,7 @@ const device_class = class DeviceClass {
             await new AuthClass()
             .verifyToken(this.token)
         
-        await Device.create({
+        const store_device = await Device.create({
             device_id: "DEVICE"+Math.floor(Math.random() * 101)+100,
             name: this.name,
             telp: this.telp,
@@ -110,7 +110,7 @@ const device_class = class DeviceClass {
             device_status: "NOT ACTIVE"
         })
 
-        return true
+        return store_device
     }
 
     async updateDevice(update) {

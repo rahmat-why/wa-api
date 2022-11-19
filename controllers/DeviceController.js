@@ -69,7 +69,7 @@ export const storeDevice = async(req, res) => {
             .setToken(token)
             .storeDevice()
 
-        return response(res, 200, true, 'Device created successfully!', {})
+        return response(res, 200, true, 'Device created successfully!', store_device)
     } catch (err) {
         return response(res, 500, false, err.message, {})
     }
