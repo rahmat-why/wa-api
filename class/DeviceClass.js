@@ -102,10 +102,11 @@ const device_class = class DeviceClass {
             await new AuthClass()
             .verifyToken(this.token)
 
-        var api_key = this.generateApiKey()
+        var device_id = "DEVICE"+Math.floor(Math.random() * 101)+100
+        var api_key = this.generateApiKey(device_id)
         
         const store_device = await Device.create({
-            device_id: "DEVICE"+Math.floor(Math.random() * 101)+100,
+            device_id: device_id,
             name: this.name,
             telp: this.telp,
             user_id: verify_token.id,
@@ -211,8 +212,9 @@ const device_class = class DeviceClass {
         this.expired_at = date.format(expired_at, 'YYYY-MM-DD HH:mm:ss');
     }
 
-    generateApiKey() {
-        var api_key = "ECOM."+cryptoJs.AES.encrypt(this.telp, 'ANGEL-KEY').toString();
+    generateApiKey(device_id) {
+        var merge_key = device_id+"|"
+        var api_key = "ECOM."+cryptoJs.AES.encrypt(merge_key, 'ANGEL-KEY').toString();
         return api_key
     }
 
