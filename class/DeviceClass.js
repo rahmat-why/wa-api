@@ -5,7 +5,7 @@ import { URL, parse } from 'url';
 import axios from 'axios';
 import date from 'date-and-time';
 import AuthClass from './../class/AuthClass.js'
-import { getSession, getChatList, isExists, sendMessage, formatPhone } from './../whatsapp.js'
+import cryptoJs from 'crypto-js';
 
 const device_class = class DeviceClass {
     constructor() {
@@ -101,13 +101,16 @@ const device_class = class DeviceClass {
         const verify_token = 
             await new AuthClass()
             .verifyToken(this.token)
+
+        var api_key = this.generateApiKey()
         
         const store_device = await Device.create({
             device_id: "DEVICE"+Math.floor(Math.random() * 101)+100,
             name: this.name,
             telp: this.telp,
             user_id: verify_token.id,
-            device_status: "NOT ACTIVE"
+            device_status: "NOT ACTIVE",
+            api_key: api_key
         })
 
         return store_device
@@ -206,6 +209,11 @@ const device_class = class DeviceClass {
     setExpiredAt() {
         const expired_at = date.addDays(new Date(), 30);
         this.expired_at = date.format(expired_at, 'YYYY-MM-DD HH:mm:ss');
+    }
+
+    generateApiKey() {
+        var api_key = "ECOM."+cryptoJs.AES.encrypt(this.telp, 'ANGEL-KEY').toString();
+        return api_key
     }
 
     async setBeforeExpiredAt() {
