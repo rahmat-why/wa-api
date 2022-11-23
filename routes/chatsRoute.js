@@ -5,6 +5,7 @@ import requestValidator from './../middlewares/requestValidator.js'
 import sessionValidator from './../middlewares/sessionValidator.js'
 import * as controller from './../controllers/chatsController.js'
 import getMessages from './../controllers/getMessages.js'
+import DeviceValidator from './../middlewares/DeviceValidator.js'
 
 const router = Router()
 const upload = multer({ dest: 'csv/' })
@@ -21,10 +22,11 @@ router.post(
     body('message').notEmpty(),
     requestValidator,
     sessionValidator,
+    DeviceValidator,
     controller.send
 )
+router.post('/send-bulk', query('id').notEmpty(), requestValidator, sessionValidator, DeviceValidator, controller.sendBulk)
 
-router.post('/send-bulk', query('id').notEmpty(), requestValidator, sessionValidator, controller.sendBulk)
 router.post('/store-schedule', upload.single('template'), controller.storeSchedule)
 router.post('/store-contact', upload.single('template'), controller.storeContact)
 

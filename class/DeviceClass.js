@@ -5,7 +5,7 @@ import { URL, parse } from 'url';
 import request from 'request';
 import date from 'date-and-time';
 import AuthClass from './../class/AuthClass.js'
-import { getSession, getChatList, isExists, sendMessage, formatPhone } from './../whatsapp.js'
+import axios from 'axios';
 
 const device_class = class DeviceClass {
     constructor() {
@@ -158,11 +158,21 @@ const device_class = class DeviceClass {
     }
 
     async isValidWhatsappNumber() {
-        const session = getSession(process.env.SESSION_ID)
-        const receiver = formatPhone(this.telp)
-        const exists = await isExists(session, receiver)
+        try{
+            const response = await axios.post('https://portal.angel-ping.my.id/chats/check-number', {
+                "receiver": this.telp
+            },{
+                headers: {
+                    'angel-key': 'ECOM.c9dc7e39c892544e816',
+                    'Content-Type': 'application/json'
+                }
+            });
 
-        return exists
+            return response.data.success
+        }
+        catch (err){
+            return false
+        }
     }
     
     isValidUrl() {

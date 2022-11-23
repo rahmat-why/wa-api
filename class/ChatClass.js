@@ -1,9 +1,8 @@
 import { URL, parse } from 'url';
 import mongoose from 'mongoose'
 import request from 'request';
-import { Schedule, ScheduleReceiver } from '../models/ScheduleModel.js';
+import { Schedule, ScheduleReceiver, Contact } from '../models/MdbModel.js';
 import mime from 'mime-types'
-import { Contact } from '../models/ContactModel.js';
 
 const ChatClass = class ChatClass {
     constructor() {
@@ -239,13 +238,11 @@ const ChatClass = class ChatClass {
     }
 
     async storeSchedule() {
-        const { title, create_form, folder_id, total_receiver } = this
-        
         const schedule = await new Schedule({
-          title,
-          createFrom: create_form,
-          folderId: folder_id,
-          totalReceiver: total_receiver
+          title: this.title,
+          createFrom: this.create_form,
+          folderId: this.folder_id,
+          totalReceiver: this.total_receiver
         })
         .save()
 
