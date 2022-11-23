@@ -72,27 +72,18 @@ export const Config = database.define('config', {
     value: Sequelize.STRING
 });
 
-<<<<<<< HEAD
-export const Contact = database.define('contact', {
-    contact_id: Sequelize.STRING,
-=======
 export const Contact = database.define('contacts', {
     contact_id: {
         primaryKey: true,
         type: Sequelize.STRING
     },
->>>>>>> c3978d050596ed426565d9e9a57138f473689694
     folder_contact_id: Sequelize.STRING,
     name: Sequelize.STRING,
     telp: Sequelize.STRING,
     profile_picture: Sequelize.STRING
 });
 
-<<<<<<< HEAD
-export const FolderContact = database.define('folder_contact', {
-=======
-export const FolderContact = database.define('folder_contacts', {
->>>>>>> c3978d050596ed426565d9e9a57138f473689694
+export const Folder = database.define('folder_contacts', {
     folder_contact_id: {
         primaryKey: true,
         type: Sequelize.STRING
