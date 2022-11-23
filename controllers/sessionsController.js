@@ -31,9 +31,9 @@ const add = (req, res) => {
 }
 
 const del = async (req, res) => {
-    const { id } = req.params
+    var id = res.locals.sessionId
     const session = getSession(id)
-
+    
     try {
         await session.logout()
     } catch {

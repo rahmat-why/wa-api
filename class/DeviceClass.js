@@ -2,10 +2,10 @@ import {
     Device
 } from './../models/ApiModel.js'
 import { URL, parse } from 'url';
-import request from 'request';
+import axios from 'axios';
 import date from 'date-and-time';
 import AuthClass from './../class/AuthClass.js'
-import { getSession, getChatList, isExists, sendMessage, formatPhone } from './../whatsapp.js'
+import cryptoJs from 'crypto-js';
 
 const device_class = class DeviceClass {
     constructor() {
@@ -101,16 +101,20 @@ const device_class = class DeviceClass {
         const verify_token = 
             await new AuthClass()
             .verifyToken(this.token)
+
+        var device_id = "DEVICE"+Math.floor(Math.random() * 101)+100
+        var api_key = this.generateApiKey(device_id)
         
-        await Device.create({
-            device_id: "DEVICE"+Math.floor(Math.random() * 101)+100,
+        const store_device = await Device.create({
+            device_id: device_id,
             name: this.name,
             telp: this.telp,
             user_id: verify_token.id,
-            device_status: "NOT ACTIVE"
+            device_status: "NOT ACTIVE",
+            api_key: api_key
         })
 
-        return true
+        return store_device
     }
 
     async updateDevice(update) {
@@ -158,11 +162,21 @@ const device_class = class DeviceClass {
     }
 
     async isValidWhatsappNumber() {
-        const session = getSession(process.env.SESSION_ID)
-        const receiver = formatPhone(this.telp)
-        const exists = await isExists(session, receiver)
+        try{
+            const response = await axios.post('https://portal.angel-ping.my.id/chats/check-number', {
+                "receiver": this.telp
+            },{
+                headers: {
+                    'angel-key': 'ECOM.c9dc7e39c892544e816',
+                    'Content-Type': 'application/json'
+                }
+            });
 
-        return exists
+            return response.data.success
+        }
+        catch (err){
+            return false
+        }
     }
     
     isValidUrl() {
@@ -196,6 +210,12 @@ const device_class = class DeviceClass {
     setExpiredAt() {
         const expired_at = date.addDays(new Date(), 30);
         this.expired_at = date.format(expired_at, 'YYYY-MM-DD HH:mm:ss');
+    }
+
+    generateApiKey(device_id) {
+        var merge_key = device_id+"|"
+        var api_key = "ECOM."+cryptoJs.AES.encrypt(merge_key, 'ANGEL-KEY').toString();
+        return api_key
     }
 
     async setBeforeExpiredAt() {

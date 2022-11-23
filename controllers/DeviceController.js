@@ -2,6 +2,7 @@ import response from './../response.js'
 import DeviceClass from './../class/DeviceClass.js'
 import ChatClass from './../class/ChatClass.js'
 import AuthClass from './../class/AuthClass.js'
+import ConfigClass from './../class/ConfigClass.js'
 
 export const showDevice = async(req, res) => {
     try {
@@ -15,7 +16,12 @@ export const showDevice = async(req, res) => {
 
         return response(res, 200, true, 'Devices found!', show_device)
     } catch (err) {
-        return response(res, 401, true, err.message, {})
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+
+        return response(res, 500, false, err.message, {})
     }
 }
 
@@ -30,7 +36,12 @@ export const getDevice = async(req, res) => {
 
         return response(res, 200, true, 'Device found!', get_device)
     } catch (err) {
-        return response(res, 401, true, err.message, {})
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+            
+        return response(res, 500, false, err.message, {})
     }
 }
 
@@ -69,9 +80,14 @@ export const storeDevice = async(req, res) => {
             .setToken(token)
             .storeDevice()
 
-        return response(res, 200, true, 'Device created successfully!', {})
+        return response(res, 200, true, 'Device created successfully!', store_device)
     } catch (err) {
-        return response(res, 401, true, err.message, {})
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+            
+        return response(res, 500, false, err.message, {})
     }
 }
 
@@ -101,7 +117,12 @@ export const updateDevice = async(req, res) => {
 
         return response(res, 200, true, 'Device updated successfully', update_device)
     } catch (err) {
-        return response(res, 401, true, err.message, {})
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+
+        return response(res, 500, false, err.message, {})
     }
 }
 
@@ -123,6 +144,11 @@ export const callWebhook = async(req, res) => {
 
         return response(res, 200, true, 'Webhook called successfully!', response_webhook)
     } catch (err) {
-        return response(res, 401, true, err.message, {})
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+            
+        return response(res, 500, false, err.message, {})
     }
 }
