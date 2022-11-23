@@ -73,12 +73,23 @@ const contact_class = class ContactClass {
     return true
   } */
 
-  async getFolder() {
-    const folder = await Folder.findOne({
-      where: { name: this.folder_name }
+  async getAllFolder() {
+    return await FolderContact.findAll({
+      where: {
+        user_id: this.folder_user_id,
+        is_active: 1
+      } 
     })
+  }
 
-    return folder
+  async getFolder() {
+    return await FolderContact.findOne({
+      where: {
+        user_id: this.folder_user_id,
+        folder_id: this.folder_id,
+        is_active: 1
+      }
+    })
   }
 
   async storeFolder() {
@@ -99,14 +110,12 @@ const contact_class = class ContactClass {
     return true
   }
 
-  async updateFolder(name, is_active, user_id) {
-    return (
-      await Folder
-      .update(
-        { name, is_active, user_id },
-        { where: { folder_contact_id: this.folder_id } }
-      )
-    )[1]
+  async updateFolder(update) {
+    await Folder.update(update, {
+      where: { 
+        folder_contact_id: this.folder_id
+      } 
+    })
   }
 
   async isExistFolder() {
@@ -120,19 +129,21 @@ const contact_class = class ContactClass {
     
     if (folder ?? false) return true
     else return false
-    // fungsi ini berisi get folder menggunakan folder id
-    // return berupa boolean (true/false)
-    // fungsi ini dipanggil di middleware
   }
 
   async isUsedFolderName() {
 
-    const folder = await this.getFolder()
-    if (folder.name === this.folder_name && folder.is_active === 1) return true
+    const folder = await Folder.findOne({
+      where: {
+        user_id: this.folder_user_id,
+        name: this.folder_name,
+        is_active: 1
+      }
+    })
+
+    if (folder ?? false) return true
     else return false
-    // fungsi ini berisi get folder menggunakan name dan user id
-    // return berupa boolean (true/false)
-    // fungsi ini dipanggil pada pada di ContactController.storeDevice() sebelum store device
+
   }
 }
 

@@ -1,6 +1,3 @@
-// fungsi ini berisi validasi isExistFolder berdasarkan folder id
-// akan digunakan pada fungsi get folder melalui route
-
 import response from './../response.js'
 import ContactClass from '../class/ContactClass.js'
 
@@ -10,7 +7,7 @@ export async function validate(req, res, next) {
 
   try {
 
-    if ( await new ContactClass().setFolderId(folder_id).isExistFolder() ) next()
+    if (await new ContactClass().setFolderId(folder_id).isExistFolder()) next()
     else return response(res, 404, false, "Folder not found")
 
   } catch(err) {
