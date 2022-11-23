@@ -20,7 +20,14 @@ router.post(
     controller.send
 )
 
-router.post('/send-bulk', query('id').notEmpty(), requestValidator, sessionValidator, controller.sendBulk)
+router.post(
+    '/send-bulk', 
+    body('receiver').notEmpty(),
+    body('message').notEmpty(),
+    requestValidator, 
+    sessionValidator, 
+    controller.sendBulk
+)
 
 router.post('/check-number', body('receiver').notEmpty(), requestValidator, sessionValidator, controller.checkNumber)
 
