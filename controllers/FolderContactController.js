@@ -11,13 +11,13 @@ export async function store(req, res) {
 
     const contact = new ContactClass()
       .setFolderName(name)
-      .setFolderUserId(id)
 
-    if (await contact.getFolder())
+    if (await contact.isUsedFolderName())
       return response(res, 422, false, "This folder already exist!")
   
-    await contact.storeFolder()
-
+    await contact
+      .setFolderUserId(id)
+      .storeFolder()
     return response(res, 200, true, "Folder created successfully!")
 
   } catch (err) {
@@ -69,21 +69,13 @@ export async function get(req, res) {
 
     const { folder_id } = req.params
   
-    if (await Folder.findOne({where: { folder_contact_id: folder_id, is_active: 1 }})) {
-  
-      let contacts = await Contact.findAll({ where: {folder_contact_id: folder_id} })
+    let contacts = await Contact.findAll({ where: {folder_contact_id: folder_id} })
 
-      return response(res, 200, true, "Folder contact found!",
-        contacts.map(({contact_id, name, telp}) => {
-          return { contact_id, name, telp }
-        })
-      )
-
-    } else {
-
-      return response(res, 422, false, "Folder not found")
-
-    }
+    return response(res, 200, true, "Folder contact found!",
+      contacts.map(({contact_id, name, telp}) => {
+        return { contact_id, name, telp }
+      })
+    )
 
   } catch(err) {
 
@@ -99,9 +91,7 @@ export async function del(req, res) {
   try {
 
     const { folder_id } = req.params
-    const folder = await Folder.findOne({ where: { folder_contact_id: folder_id, is_active: 1 } })
-
-    if ( folder ) {
+    const {name, user_id} = await Folder.findOne({ where: { folder_contact_id: folder_id, is_active: 1 } })
 
       if (await Contact.findOne({ where: { folder_contact_id: folder_id } })) {
   
@@ -110,18 +100,12 @@ export async function del(req, res) {
       } else {
 
         await new ContactClass()
-        .setFolderId(folder_id)
-        .updateFolder(folder.name, 0, folder.user_id)
+          .setFolderId(folder_id)
+          .updateFolder(name, 0, user_id)
 
         return response(res, 200, true, "Folder deleted successfully!")
   
       }
-
-    } else {
-
-      return response(res, 422, false, "This folder not exist!")
-
-    }
 
   } catch(err) {
 

@@ -109,6 +109,31 @@ const contact_class = class ContactClass {
     )[1]
   }
 
+  async isExistFolder() {
+
+    const folder = await Folder.findOne({
+      where: {
+        folder_contact_id: this.folder_id,
+        is_active: 1
+      }
+    })
+    
+    if (folder ?? false) return true
+    else return false
+    // fungsi ini berisi get folder menggunakan folder id
+    // return berupa boolean (true/false)
+    // fungsi ini dipanggil di middleware
+  }
+
+  async isUsedFolderName() {
+
+    const folder = await this.getFolder()
+    if (folder.name === this.folder_name && folder.is_active === 1) return true
+    else return false
+    // fungsi ini berisi get folder menggunakan name dan user id
+    // return berupa boolean (true/false)
+    // fungsi ini dipanggil pada pada di ContactController.storeDevice() sebelum store device
+  }
 }
 
 export default contact_class
