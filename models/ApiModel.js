@@ -40,7 +40,8 @@ export const Order = database.define('orders', {
     unique_code: Sequelize.STRING,
     payment_status: Sequelize.STRING,
     order_at: Sequelize.STRING,
-    due_at: Sequelize.STRING
+    due_at: Sequelize.STRING,
+    user_id: Sequelize.STRING
 });
 
 export const DetailOrder = database.define('detail_orders', {

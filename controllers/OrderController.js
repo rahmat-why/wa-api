@@ -45,6 +45,28 @@ export const getProduct = async(req, res) => {
     }
 }
 
+export const showOrder = async(req, res) => {
+
+    try {
+        var authorization = req.headers["authorization"].split(" ")
+        const token = authorization[1]
+
+        let show_order = 
+            await new OrderClass()
+            .setToken(token)
+            .showOrder()
+
+        return response(res, 200, true, 'Order list found!', show_order)
+    } catch (err) {
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+
+        return response(res, 500, false, err.message, {})
+    }
+}
+
 export const getOrder = async(req, res) => {
     const { order_id } = req.params
 
@@ -69,6 +91,9 @@ export const storeOrder = async(req, res) => {
     const { device_id, product_id } = req.body
 
     try {
+        var authorization = req.headers["authorization"].split(" ")
+        const token = authorization[1]
+
         let is_running_order = 
             await new OrderClass()
             .setDeviceId(device_id)
@@ -91,6 +116,7 @@ export const storeOrder = async(req, res) => {
             await new OrderClass()
             .setDeviceId(device_id)
             .setProductId(product_id)
+            .setToken(token)
             .storeOrder()
 
         return response(res, 200, true, 'Order success!', store_order)
@@ -152,6 +178,39 @@ export const rollbackAcceptOrder = async(req, res) => {
             .rollbackAcceptOrder()
 
         return response(res, 200, true, 'Rollback order successfully!', {})
+    } catch (err) {
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+
+        return response(res, 500, false, err.message, {})
+    }
+}
+
+export const cancelOrder = async(req, res) => {
+    const { order_id } = req.params
+
+    try {
+        let get_order = 
+            await new OrderClass()
+            .setOrderId(order_id)
+            .getOrder()
+            
+        if (get_order.payment_status == "PAID") {
+            return response(res, 422, true, 'Order is paid!', {})
+        }
+
+        if (get_order.payment_status == "CANCELED") {
+            return response(res, 422, true, 'Order is canceled!', {})
+        }
+
+        let cancel_order = 
+            await new OrderClass()
+            .setOrderId(order_id)
+            .cancelOrder()
+
+        return response(res, 200, true, 'Cancel order successfully!', {})
     } catch (err) {
         let notification_error = 
             await new ConfigClass()
