@@ -40,7 +40,8 @@ export const Order = database.define('orders', {
     unique_code: Sequelize.STRING,
     payment_status: Sequelize.STRING,
     order_at: Sequelize.STRING,
-    due_at: Sequelize.STRING
+    due_at: Sequelize.STRING,
+    user_id: Sequelize.STRING
 });
 
 export const DetailOrder = database.define('detail_orders', {
@@ -71,7 +72,7 @@ export const Config = database.define('config', {
     value: Sequelize.STRING
 });
 
-export const Contact = database.define('contact', {
+export const Contact = database.define('contacts', {
     contact_id: {
         primaryKey: true,
         type: Sequelize.STRING
@@ -82,7 +83,7 @@ export const Contact = database.define('contact', {
     profile_picture: Sequelize.STRING
 });
 
-export const Folder = database.define('folder_contact', {
+export const Folder = database.define('folder_contacts', {
     folder_contact_id: {
         primaryKey: true,
         type: Sequelize.STRING

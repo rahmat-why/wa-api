@@ -1,4 +1,5 @@
 import { Contact, Folder } from '../models/ApiModel.js'
+import crypto from 'crypto'
 
 const contact_class = class ContactClass {
   constructor() {
@@ -81,8 +82,15 @@ const contact_class = class ContactClass {
   }
 
   async storeFolder() {
+    
+    let folder_contact_id = crypto.randomBytes(5).toString('hex')
+  
+    while (await Folder.findOne({ where: { folder_contact_id } })) {
+      folder_contact_id = crypto.randomBytes(5).toString('hex')
+    }
+
     await Folder.create({
-      folder_contact_id: this.folder_id,
+      folder_contact_id,
       name: this.folder_name,
       is_active: 1,
       user_id: this.folder_user_id

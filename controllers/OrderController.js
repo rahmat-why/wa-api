@@ -1,6 +1,7 @@
 import response from './../response.js'
 import OrderClass from './../class/OrderClass.js'
 import DeviceClass from './../class/DeviceClass.js'
+import ConfigClass from './../class/ConfigClass.js'
 
 export const showProduct = async(req, res) => {
 
@@ -11,7 +12,12 @@ export const showProduct = async(req, res) => {
 
         return response(res, 200, true, 'List product found!', show_product)
     } catch (err) {
-        return response(res, 401, true, err.message, {})
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+
+        return response(res, 500, false, err.message, {})
     }
 }
 
@@ -30,7 +36,34 @@ export const getProduct = async(req, res) => {
 
         return response(res, 200, true, 'Product found!', get_product)
     } catch (err) {
-        return response(res, 401, true, err.message, {})
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+
+        return response(res, 500, false, err.message, {})
+    }
+}
+
+export const showOrder = async(req, res) => {
+
+    try {
+        var authorization = req.headers["authorization"].split(" ")
+        const token = authorization[1]
+
+        let show_order = 
+            await new OrderClass()
+            .setToken(token)
+            .showOrder()
+
+        return response(res, 200, true, 'Order list found!', show_order)
+    } catch (err) {
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+
+        return response(res, 500, false, err.message, {})
     }
 }
 
@@ -45,7 +78,12 @@ export const getOrder = async(req, res) => {
 
         return response(res, 200, true, 'Order found!', get_order)
     } catch (err) {
-        return response(res, 401, true, err.message, {})
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+
+        return response(res, 500, false, err.message, {})
     }
 }
 
@@ -53,6 +91,9 @@ export const storeOrder = async(req, res) => {
     const { device_id, product_id } = req.body
 
     try {
+        var authorization = req.headers["authorization"].split(" ")
+        const token = authorization[1]
+
         let is_running_order = 
             await new OrderClass()
             .setDeviceId(device_id)
@@ -75,11 +116,17 @@ export const storeOrder = async(req, res) => {
             await new OrderClass()
             .setDeviceId(device_id)
             .setProductId(product_id)
+            .setToken(token)
             .storeOrder()
 
         return response(res, 200, true, 'Order success!', store_order)
     } catch (err) {
-        return response(res, 401, true, err.message, {})
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+
+        return response(res, 500, false, err.message, {})
     }
 }
 
@@ -103,7 +150,12 @@ export const acceptOrder = async(req, res) => {
 
         return response(res, 200, true, 'Order accepted!', {})
     } catch (err) {
-        return response(res, 401, true, err.message, {})
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+
+        return response(res, 500, false, err.message, {})
     }
 }
 
@@ -127,6 +179,44 @@ export const rollbackAcceptOrder = async(req, res) => {
 
         return response(res, 200, true, 'Rollback order successfully!', {})
     } catch (err) {
-        return response(res, 401, true, err.message, {})
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+
+        return response(res, 500, false, err.message, {})
+    }
+}
+
+export const cancelOrder = async(req, res) => {
+    const { order_id } = req.params
+
+    try {
+        let get_order = 
+            await new OrderClass()
+            .setOrderId(order_id)
+            .getOrder()
+            
+        if (get_order.payment_status == "PAID") {
+            return response(res, 422, true, 'Order is paid!', {})
+        }
+
+        if (get_order.payment_status == "CANCELED") {
+            return response(res, 422, true, 'Order is canceled!', {})
+        }
+
+        let cancel_order = 
+            await new OrderClass()
+            .setOrderId(order_id)
+            .cancelOrder()
+
+        return response(res, 200, true, 'Cancel order successfully!', {})
+    } catch (err) {
+        let notification_error = 
+            await new ConfigClass()
+            .setErrorMessage(err.message)
+            .notificationError()
+
+        return response(res, 500, false, err.message, {})
     }
 }

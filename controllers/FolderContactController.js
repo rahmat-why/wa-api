@@ -1,7 +1,6 @@
 import response from '../response.js'
 import ContactClass from '../class/ContactClass.js'
 import { Folder, Contact } from '../models/ApiModel.js'
-import crypto from 'crypto'
 
 export async function store(req, res) {
 
@@ -9,21 +8,13 @@ export async function store(req, res) {
   const {id} = req.verified_token
 
   try {
-    
-    let folder_contact_id = crypto.randomBytes(5).toString('hex')
-  
-    while (await Folder.findOne({ where: { folder_contact_id } })) {
-      folder_contact_id = crypto.randomBytes(5).toString('hex')
-    }
 
     const contact = new ContactClass()
-      .setFolderId(folder_contact_id)
       .setFolderName(name)
       .setFolderUserId(id)
 
-    if (await contact.getFolder()) {
+    if (await contact.getFolder())
       return response(res, 422, false, "This folder already exist!")
-    }
   
     await contact.storeFolder()
 
@@ -38,11 +29,16 @@ export async function store(req, res) {
 
 }
 
-export async function getAll(req, res) {
+export async function show(req, res) {
 
   try {
 
-    let Folders = await Folder.findAll({ where: { is_active: 1 } })
+    let Folders = await Folder.findAll({
+      where: {
+        user_id: req.verified_token.id,
+        is_active: 1
+      }
+    })
 
     if (Folders.length > 0) {
 

@@ -20,7 +20,7 @@ const validate = async(req, res, next) => {
         next()
 
     } catch (err) {
-        return response(res, 401, true, err.message, {})
+        return response(res, 401, false, err.message, {})
     }
 }
 

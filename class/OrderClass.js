@@ -4,8 +4,8 @@ import {
     DetailOrder
 } from '../models/ApiModel.js'
 import date from 'date-and-time';
-import sequelize from'sequelize'
 import DeviceClass from './DeviceClass.js'
+import AuthClass from './../class/AuthClass.js'
 
 const order_class = class OrderClass {
     constructor() {
@@ -17,6 +17,12 @@ const order_class = class OrderClass {
         this.due_at = null
         this.product_id = null
         this.quantity = 1
+        this.token = null
+    }
+
+    setToken(token) {
+        this.token = token
+        return this
     }
 
     setOrderId(order_id) {
@@ -83,6 +89,21 @@ const order_class = class OrderClass {
         return product
     }
 
+    async showOrder() {
+        const verify_token = 
+            await new AuthClass()
+            .verifyToken(this.token)
+
+        var orders = await Order.findAll({
+            where: {
+                user_id: verify_token.id
+            },
+            attributes: ['order_id','device_id','total_payment','subtotal','unique_code','payment_status','order_at','due_at']
+        })
+
+        return orders
+    }
+
     async getOrder() {
         var order = await Order.findOne({
             where: {
@@ -99,6 +120,10 @@ const order_class = class OrderClass {
     async storeOrder() {
         this.setOrderAt()
 
+        const verify_token = 
+            await new AuthClass()
+            .verifyToken(this.token)
+
         const unique_code = this.generateUniqueCode()
         const get_product = await this.getProduct()
         const subtotal = get_product.price*this.quantity
@@ -114,7 +139,8 @@ const order_class = class OrderClass {
             unique_code: unique_code,
             payment_status: this.payment_status,
             order_at: this.order_at,
-            due_at: this.due_at
+            due_at: this.due_at,
+            user_id: verify_token.id
         })
 
         await this.storeDetailOrder()
@@ -208,6 +234,20 @@ const order_class = class OrderClass {
         }
 
         return true
+    }
+
+    async cancelOrder() {
+        var update = {
+            payment_status: "CANCELED"
+        }
+        
+        await Order.update(update, {
+            where: {
+                order_id: this.order_id
+            }
+        });
+
+        return 1
     }
 }
 

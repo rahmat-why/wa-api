@@ -15,13 +15,13 @@ const validate = async(req, res, next) => {
             .isExistDevice()
 
         if (!get_device) {
-            return response(res, 422, true, 'Device not found!', {})
+            return response(res, 422, false, 'Device not found!', {})
         }
 
         next()
 
     } catch (err) {
-        return response(res, 401, true, err.message, {})
+        return response(res, 401, false, err.message, {})
     }
 }
 
