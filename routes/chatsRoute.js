@@ -22,8 +22,6 @@ router.post(
 
 router.post(
     '/send-bulk', 
-    body('receiver').notEmpty(),
-    body('message').notEmpty(),
     requestValidator, 
     sessionValidator, 
     controller.sendBulk
