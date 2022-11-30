@@ -122,9 +122,9 @@ const formattedResponse = async (req, res) => {
         }
 
         return response(res, 200, true, 'success.', formatted_response)
-    } catch {
-        return response(res, 500, false, 'failed')
-    }
+    } catch (err) {
+        return response(res, 500, false, err.message)
+      }
 }
 
 export { getList, send, sendBulk, checkNumber, formattedResponse }
