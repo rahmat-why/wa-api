@@ -1,5 +1,6 @@
 import { getSession, getChatList, isExists, sendMessage, formatPhone } from './../whatsapp.js'
 import response from './../response.js'
+import ChatClass from './../class/ChatClass.js'
 
 const getList = (req, res) => {
     return response(res, 200, true, '', getChatList(res.locals.sessionId))
@@ -92,4 +93,38 @@ const checkNumber = async (req, res) => {
 
 }
 
-export { getList, send, sendBulk, checkNumber }
+const formattedResponse = async (req, res) => {
+    const body = req.body
+
+    try {
+        if(body.content.message) {
+            if(body.content.message.key.sessionId) {
+                var sessionId = body.content.message.key.sessionId.split("@")[0]
+                var message = body.content.message
+                var formatted_response = 
+                    await new ChatClass()
+                    .setSessionId(sessionId)
+                    .setMessage(body.content.message)
+                    .formatWebhookChat()
+
+            }else if(body.content.message.key.remoteJid){
+                var sessionId = body.content.message.key.remoteJid.split("@")[0]
+                var message = body.content.message
+                var formatted_response = 
+                    await new ChatClass()
+                    .setSessionId(sessionId)
+                    .setMessage(body.content.message)
+                    .formatWebhookChat()
+
+            }
+
+            formatted_response.key.timestamp = body.content.timestamp
+        }
+
+        return response(res, 200, true, 'success.', formatted_response)
+    } catch {
+        return response(res, 500, false, 'failed')
+    }
+}
+
+export { getList, send, sendBulk, checkNumber, formattedResponse }
