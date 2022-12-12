@@ -145,7 +145,7 @@ const chat_class = class ChatClass {
             'method': 'POST',
             'url': 'https://newsweather.angel-ping.my.id/create',
             'headers': {
-                'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiUmFobWF0IiwicGFzc3dvcmQiOiJSYWhtYXQiLCJpYXQiOjE2NzA4MDY5NTl9.7_mKvfdHWQCm5VwC5hEKMw7BHZU3GKsaCD6mXcmyv9s',
+                'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiMTIzNCIsInBhc3N3b3JkIjoiMTIzIiwiaWF0IjoxNjY4NTA2MDAzfQ.sFkDtqjJQP7cTJa0IJR66Nu0tCV4vIrru6Bqm6iCEH8',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(this.response)
