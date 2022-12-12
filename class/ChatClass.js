@@ -43,7 +43,7 @@ const chat_class = class ChatClass {
                         fromMe: false
                     }
                 }
-            }else if ("extendedTextMessage" in message.message) {
+            }else if (message.message.extendedTextMessage != null) {
                 var response = {
                     key:{
                         id: message.key.id,
@@ -71,6 +71,7 @@ const chat_class = class ChatClass {
         
             return response
         } catch {
+            console.log('0')
             return 0
         }
     }
@@ -137,11 +138,14 @@ const chat_class = class ChatClass {
     }
 
     async storeLog() {
+        // var token_dev = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiUmFobWF0IiwicGFzc3dvcmQiOiJSYWhtYXQiLCJpYXQiOjE2NzA4MDY5NTl9.7_mKvfdHWQCm5VwC5hEKMw7BHZU3GKsaCD6mXcmyv9s'
+        // var token_prod = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiMTIzNCIsInBhc3N3b3JkIjoiMTIzIiwiaWF0IjoxNjY4NTA2MDAzfQ.sFkDtqjJQP7cTJa0IJR66Nu0tCV4vIrru6Bqm6iCEH8'
+        
         var options = {
             'method': 'POST',
             'url': 'https://newsweather.angel-ping.my.id/create',
             'headers': {
-                'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiMTIzNCIsInBhc3N3b3JkIjoiMTIzIiwiaWF0IjoxNjY4NTA2MDAzfQ.sFkDtqjJQP7cTJa0IJR66Nu0tCV4vIrru6Bqm6iCEH8',
+                'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiUmFobWF0IiwicGFzc3dvcmQiOiJSYWhtYXQiLCJpYXQiOjE2NzA4MDY5NTl9.7_mKvfdHWQCm5VwC5hEKMw7BHZU3GKsaCD6mXcmyv9s',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(this.response)

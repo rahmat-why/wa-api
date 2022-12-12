@@ -98,8 +98,6 @@ const createSession = async (sessionId, isLegacy = false, res = null) => {
     wa.ev.on('messages.upsert', async (m) => {
         try{
             const message = m.messages[0]
-        
-            console.log(JSON.stringify([message, m.type]))
 
             const valid_types = ["notify", "append"]
             if(!valid_types.includes(m.type)) {

@@ -24,6 +24,7 @@ const config_class = class ConfigClass {
     }
     
     async notificationError() {
+        return false
         var options = {
             'method': 'POST',
             'url': 'https://hooks.slack.com/services/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',
