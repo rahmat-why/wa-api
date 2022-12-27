@@ -93,7 +93,7 @@ const checkNumber = async (req, res) => {
 
 }
 
-const mappingSessionId = async (name) => {
+const mappingSessionId = (name) => {
     if(name == "Alda - Elite Health Consultant") {
         var sessionId = "6281380875421";
     }else if(name == "Angga - Elite Health Consultant") {
