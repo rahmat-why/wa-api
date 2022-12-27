@@ -2,7 +2,7 @@ import {
     Order,
     Product,
     DetailOrder
-} from '../models/ApiModel.js'
+} from '../models/MySQLModel.js'
 import date from 'date-and-time';
 import DeviceClass from './DeviceClass.js'
 import AuthClass from './../class/AuthClass.js'

@@ -1,7 +1,7 @@
 // import sequelize 
 import { Sequelize } from "sequelize";
 // import connection 
-import database from "../config/database.js";
+import database from "../config/MySQL.js";
 
 export const User = database.define('users', {
     id: {

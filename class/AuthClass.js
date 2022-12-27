@@ -2,7 +2,7 @@ import jsonwebtoken from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import {
     User
-} from './../models/ApiModel.js'
+} from '../models/MySQLModel.js'
 import { getSession, isExists, sendMessage, formatPhone } from './../whatsapp.js'
 
 const auth_class = class AuthClass {

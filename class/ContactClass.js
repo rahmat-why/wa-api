@@ -1,4 +1,4 @@
-import { Contact, Folder } from '../models/ApiModel.js'
+import { Contact, Folder } from '../models/MySQLModel.js'
 import crypto from 'crypto'
 
 const contact_class = class ContactClass {

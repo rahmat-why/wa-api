@@ -1,6 +1,6 @@
 import {
     Config
-} from './../models/ApiModel.js'
+} from '../models/MySQLModel.js'
 import request from 'request';
 
 const config_class = class ConfigClass {

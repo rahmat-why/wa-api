@@ -1,6 +1,6 @@
 import response from '../response.js'
 import ContactClass from '../class/ContactClass.js'
-import { Folder, Contact } from '../models/ApiModel.js'
+import { Folder, Contact } from '../models/MySQLModel.js'
 
 export async function storeFolder(req, res) {
 

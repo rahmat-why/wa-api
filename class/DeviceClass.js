@@ -1,6 +1,6 @@
 import {
     Device
-} from './../models/ApiModel.js'
+} from '../models/MySQLModel.js'
 import { URL, parse } from 'url';
 import axios from 'axios';
 import date from 'date-and-time';
