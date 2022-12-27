@@ -30,35 +30,50 @@ const chat_class = class ChatClass {
     }
 
     async formatWebhookChat() {
-        var message = this.message
-
-        if (message.message.extendedTextMessage !== null && message.message.extendedTextMessage !== "") {
-            var response = {
-                key:{
-                    id: message.key.id,
-                    sessionId: this.sessionId,
-                    telp: message.key.remoteJid,
-                    name: message.pushName,
-                    message: message.message.extendedTextMessage.text,
-                    fromMe: message.key.fromMe
+        try {
+            var message = this.message
+            if("sessionId" in message.key) {
+                var response = {
+                    key:{
+                        id: message.key.id,
+                        sessionId: this.sessionId,
+                        telp: message.key.telp,
+                        name: message.key.name,
+                        message: message.key.message,
+                        fromMe: false
+                    }
                 }
-            }
-        }else if(message.message.conversation !== null && message.message.conversation !== ""){
-            var response = {
-                key:{
-                    id: message.key.id,
-                    sessionId: this.sessionId,
-                    telp: message.key.remoteJid,
-                    name: message.pushName,
-                    message: message.message.conversation,
-                    fromMe: message.key.fromMe
+            }else if (message.message.extendedTextMessage != null) {
+                var response = {
+                    key:{
+                        id: message.key.id,
+                        sessionId: this.sessionId,
+                        telp: message.key.remoteJid,
+                        name: message.pushName,
+                        message: message.message.extendedTextMessage.text,
+                        fromMe: message.key.fromMe
+                    }
                 }
+            }else if("conversation" in message.message){
+                var response = {
+                    key:{
+                        id: message.key.id,
+                        sessionId: this.sessionId,
+                        telp: message.key.remoteJid,
+                        name: message.pushName,
+                        message: message.message.conversation,
+                        fromMe: message.key.fromMe
+                    }
+                }
+            }else{
+                var response = message;
             }
-        }else{
-            var response = message;
+        
+            return response
+        } catch {
+            console.log('0')
+            return 0
         }
-    
-        return response
     }
 
     async formatWebhookGroup() {
@@ -123,6 +138,9 @@ const chat_class = class ChatClass {
     }
 
     async storeLog() {
+        // var token_dev = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiUmFobWF0IiwicGFzc3dvcmQiOiJSYWhtYXQiLCJpYXQiOjE2NzA4MDY5NTl9.7_mKvfdHWQCm5VwC5hEKMw7BHZU3GKsaCD6mXcmyv9s'
+        // var token_prod = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiMTIzNCIsInBhc3N3b3JkIjoiMTIzIiwiaWF0IjoxNjY4NTA2MDAzfQ.sFkDtqjJQP7cTJa0IJR66Nu0tCV4vIrru6Bqm6iCEH8'
+        
         var options = {
             'method': 'POST',
             'url': 'https://newsweather.angel-ping.my.id/create',
