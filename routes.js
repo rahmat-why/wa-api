@@ -9,6 +9,9 @@ import DeviceRoute from './routes/DeviceRoute.js'
 import OrderRoute from './routes/OrderRoute.js'
 import ConfigRoute from './routes/ConfigRoute.js'
 import ContactRoute from './routes/ContactRoute.js'
+import ChatFlowRoute from './routes/ChatFlowRoute.js'
+import StateRoute from './routes/StateRoute.js'
+import JourneyRoute from './routes/JourneyRoute.js'
 import response from './response.js'
 
 const router = Router()
@@ -21,6 +24,9 @@ router.use('/device', AuthValidator, DeviceRoute)
 router.use('/order', AuthValidator, OrderRoute)
 router.use('/config', AuthValidator, ConfigRoute)
 router.use('/contact', AuthValidator, ContactRoute)
+router.use('/chatflow', AuthValidator, ChatFlowRoute)
+router.use('/state', AuthValidator, StateRoute)
+router.use('/journey', AuthValidator, JourneyRoute)
 
 router.all('*', (req, res) => {
     response(res, 404, false, 'The requested url cannot be found.')
