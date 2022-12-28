@@ -3,6 +3,7 @@ import mongoose from "mongoose"
 const { Schema, model } = mongoose
 
 const scheduleSchema = new Schema({
+  scheduleId: String,
   title: String,
   totalReceiver: Number,
   userId: Number,
@@ -11,7 +12,7 @@ const scheduleSchema = new Schema({
 })
 
 const scheduleReceiverSchema = new Schema({
-  scheduleId: mongoose.Types.ObjectId,
+  scheduleId: String,
   deviceId: String,
   telp: String,
   category: String,

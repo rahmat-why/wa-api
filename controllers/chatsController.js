@@ -95,26 +95,51 @@ const showDetailSchedule = async (req, res) => {
 
 const storeSchedule = async (req, res) => {
     const {title, create_form, folder_id} = req.body
+    if(!req.file) {
+      return response(res, 422, false, "Template required!", {})
+    }
 
+    var authorization = req.headers["authorization"].split(" ")
+    const token = authorization[1]
+    
     // validate req body pada route
     // validate schedule time minimum 10 mnt from now
     // jika terdapat error, kirim response error beserta message & data yang penyebab nya
 
+    var schedule_id = "SCH"+Math.floor(Math.random() * 1000)
     const schedule = await new ChatClass()
-        .setTitle(title)
-        .setCreateForm(create_form)
-        .setFolderId(folder_id)
-        .storeSchedule()
+      .setToken(token)
+      .setScheduleId(schedule_id)
+      .setTitle(title)
+      .setCreateForm(create_form)
+      .setFolderId(folder_id)
+      .setToken(token)
+      .storeSchedule()
 
     const csvFilePath = join(process.cwd(), req.file.path)
     const results = []
     const receiverIds = []
+    const errors = []
 
     createReadStream(csvFilePath).pipe(csv())
       .on('data', (data) => {
-        results.push(data)
+        var url_type = ["image", "document"]
+        var text_type = ["text"]
+        if(!data.type || !data.device_id || !data.telp || !data.schedule_at || data.type == "" || data.device_id == "" || data.telp == "" || data.schedule_at == ""){
+          errors.push(data);
+        }else if(url_type.includes(data.type) && data.url == ""){
+          errors.push(data);
+        }else if(text_type.includes(data.type) && data.text == ""){
+          errors.push(data);
+        }else{
+          results.push(data)
+        }
       })
       .on('end', async () => {
+        if(errors.length > 0) {
+          return response(res, 422, false, "File must same with template!", {})
+        }
+
         for (const result of results) {
             const formatted_telp = new AuthClass()
               .normalizeTelp(result.telp)
@@ -127,13 +152,13 @@ const storeSchedule = async (req, res) => {
               .setDeviceId(result.device_id)
               .isActiveDevice()
 
-            if (!validWhatsappNumber || !isActiveDevice) {
-              continue
-            } 
+            // if (!validWhatsappNumber || !isActiveDevice) {
+            //   continue
+            // } 
 
             try {
               const newReceiver = await new ChatClass()
-                .setScheduleId(schedule._id)
+                .setScheduleId(schedule_id)
                 .setCategory(result.type)
                 .setDeviceId(result.device_id)
                 .setTelp(formatted_telp)
@@ -170,24 +195,40 @@ const showContact = async (req, res) => {
 
 const storeContact = async (req, res) => {
   const {folder_id} = req.body
+  if(!req.file) {
+    return response(res, 422, false, "Template required!", {})
+  }
+
   const csvFilePath = join(process.cwd(), req.file.path)
   const results = []
   const contacts = []
-
-  // validate is valid telp berdasarkan formatted_telp
-  // ubah penamaan findContact menjadi getContact
-  // logic folder contact udah benar, kalau bisa dipindah ke class logic nya
-  // jika tdk bisa, boleh di beri comment penjelasan logic nya
+  const errors = [];
 
   createReadStream(csvFilePath).pipe(csv())
     .on('data', (data) => {
-      results.push(data)
+      if(!data.telp || !data.name || data.telp == null || data.name == null){
+        errors.push(data);
+      }else{
+        results.push(data)
+      }
     })
     .on('end', async () => {
+      if(errors.length > 0) {
+        return response(res, 422, false, "File must contain telp & name!", {})
+      }
+
       try {
         for (const result of results) {
           const formatted_telp = new AuthClass()
             .normalizeTelp(result.telp)
+
+          const validWhatsappNumber = await new DeviceClass()
+            .setTelp(formatted_telp)
+            .isValidWhatsappNumber()
+          
+          if (!validWhatsappNumber) {
+            continue
+          } 
 
           var contact = new ChatClass()
             .setTelp(formatted_telp)
@@ -195,21 +236,20 @@ const storeContact = async (req, res) => {
             .setProfilePicture(result.profile_picture)
             .setFolderId(folder_id)
           
-          const oldContact = await contact.findContact()
-
-          if (oldContact) {
-            if (!oldContact.folder_ids.includes(contact.folder_id)) {
-              contact = await contact.addContactFolder()
+          const is_exist_contact = await contact.getContact()
+          if (is_exist_contact) {
+            if (!is_exist_contact.folder_ids.includes(contact.folder_id)) {
+              var contact = await contact.addContactFolder()
+            }else {
+              var contact = is_exist_contact
             }
-            else {
-              contact = oldContact
-            }
-          }
-          else {
-            contact = await contact.storeContact()
+          }else{
+            var contact = await contact.storeContact()
           }
           contacts.push(contact)
         }
+
+        return response(res, 200, true, 'Contact imported successfully!', contacts)
 
       } catch (err) {
         return response(res, 422, false, err.message, {})
@@ -218,8 +258,6 @@ const storeContact = async (req, res) => {
     .on('error', (err) => {
       return response(res, 422, false, err.message, {})
     })
-
-    return response(res, 200, true, 'Contact imported successfully!', contacts)
 }
 
 export { getList, send, sendBulk, showSchedule, showDetailSchedule, storeSchedule, showContact, storeContact }

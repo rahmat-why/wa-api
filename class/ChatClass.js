@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 import request from 'request';
 import { Schedule, ScheduleReceiver, Contact } from '../models/MdbModel.js';
 import mime from 'mime-types'
+import AuthClass from './AuthClass.js'
 
 const ChatClass = class ChatClass {
     constructor() {
@@ -18,8 +19,9 @@ const ChatClass = class ChatClass {
         this.create_form = null,
         this.folder_id = null,
         this.total_receiver = null,
-        this.name = null
-        this.profile_picture = null
+        this.name = null,
+        this.profile_picture = null,
+        this.token = null
     }
 
     setWebhook(webhook) {
@@ -121,6 +123,11 @@ const ChatClass = class ChatClass {
 
     setProfilePicture(profile_picture) {
         this.profile_picture = profile_picture
+        return this
+    }
+
+    setToken(token) {
+        this.token = token
         return this
     }
 
@@ -238,11 +245,17 @@ const ChatClass = class ChatClass {
     }
 
     async storeSchedule() {
+        const verify_token = 
+            await new AuthClass()
+            .verifyToken(this.token)
+
         const schedule = await new Schedule({
+          scheduleId: this.schedule_id,
           title: this.title,
           createFrom: this.create_form,
           folderId: this.folder_id,
-          totalReceiver: this.total_receiver
+          totalReceiver: this.total_receiver,
+          userId: verify_token.id
         })
         .save()
 
@@ -271,7 +284,7 @@ const ChatClass = class ChatClass {
         return contacts
     }  
 
-    async findContact() {
+    async getContact() {
         const contact = await Contact.findOne({ telp: this.telp })
         return contact
     }
