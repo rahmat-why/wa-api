@@ -1,11 +1,11 @@
-import mongoose from 'mongoose'
+import { randomBytes } from 'crypto'
 import { States } from '../models/MongoDBModel.js'
 
 export default class StateClass {
 
   constructor() {
-    this.state_id = null,
-    this.name = null,
+    this.state_id = null
+    this.name = null
     this.message = null
   }
 
@@ -13,28 +13,35 @@ export default class StateClass {
 
   /* <------------ Define ------------> */
 
-  setStateId(state_id) { this.state_id = new mongoose.Types.ObjectId(state_id); return this }
+  setStateId(state_id) { this.state_id = state_id; return this }
   setName(name) { this.name = name; return this }
   setMessage(message) { this.message = message; return this }
 
 
-  
+
   /* <------------ Create, Read, Update, Delete ------------> */
 
   async storeState() {
     return await States.create({
-      _id: this.state_id ?? new mongoose.Types.ObjectId(),
+      _id: this.state_id ?? randomBytes(12).toString('hex'),
       name: this.name,
       message: this.message
     })
   }
 
-  async getState() { return await States.findOne({ name: this.name }).exec() }
+  async getState() { return await States.findById(this.state_id).exec() }
 
   async updateState(name, message) {
-    return await States.findOneAndUpdate({ name: this.name }, { name, message }).exec()
+    if (!(name && message)) {
+      let doc = await this.getState()
+      return await States.findByIdAndUpdate(this.state_id, {
+        name: doc.name ?? name,
+        message: doc.message ?? message
+      }).exec()
+    }
+    return await States.findByIdAndUpdate(this.state_id, { name, message }).exec()
   }
 
-  async deleteState() { return await States.deleteOne({ name: this.name }) }
+  async deleteState() { return await States.findByIdAndDelete(this.state_id).exec() }
 
 }
