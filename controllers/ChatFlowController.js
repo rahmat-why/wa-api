@@ -1,12 +1,11 @@
 import response from '../response.js'
 import ChatFlowClass from '../class/ChatFlowClass.js'
 
-export async function createChatFlow(req, res) {
+export async function storeChatFlow(req, res) {
   const { id: user_id } = req.verified_token
-  let { id, name, description } = req.body
+  let { name, description } = req.body
   try {
     const doc = await new ChatFlowClass()
-      .setChatFlowId(id)
       .setUserId(user_id)
       .setName(name)
       .setDescription(description)
@@ -18,12 +17,12 @@ export async function createChatFlow(req, res) {
   }
 }
 
-export async function getAllChatFlow(req, res) {
+export async function showChatFlow(req, res) {
   const { id: user_id } = req.verified_token
   try {
     const doc = await new ChatFlowClass()
       .setUserId(user_id)
-      .getAllChatFlow()
+      .showChatFlow()
     return response(res, 200, true, 'Successfully retrieve all chatflow', doc.map(e => e.toObject()))
   } catch (err) {
     console.error(err)
@@ -32,10 +31,10 @@ export async function getAllChatFlow(req, res) {
 }
 
 export async function getChatFlow(req, res) {
-  let { id } = req.params
+  let { chatflow_id } = req.params
   try {
     const doc = await new ChatFlowClass()
-      .setChatFlowId(id)
+      .setChatFlowId(chatflow_id)
       .getChatFlow()
     return response(res, 200, true, 'Successfully retrieve chatflow', doc.toObject())
   } catch (err) {
@@ -45,11 +44,11 @@ export async function getChatFlow(req, res) {
 }
 
 export async function updateChatFlow(req, res) {
-  let { id } = req.params
+  let { chatflow_id } = req.params
   let { name, description } = req.body
   try {
     const doc = await new ChatFlowClass()
-      .setChatFlowId(id)
+      .setChatFlowId(chatflow_id)
       .updateChatFlow(name, description)
     return response(res, 200, true, 'Successfully update chatflow', doc.toObject())
   } catch (err) {
@@ -59,10 +58,10 @@ export async function updateChatFlow(req, res) {
 }
 
 export async function deleteChatFlow(req, res) {
-  let { id } = req.params
+  let { chatflow_id } = req.params
   try {
     const doc = await new ChatFlowClass()
-      .setChatFlowId(id)
+      .setChatFlowId(chatflow_id)
       .deleteChatFlow()
     return response(res, 200, true, 'Successfully delete chatflow', doc.toObject())
   } catch (err) {
