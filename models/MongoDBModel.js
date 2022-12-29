@@ -2,20 +2,23 @@ import mongoose, { Schema } from 'mongoose'
 
 export const States = mongoose.model('states', new Schema({
   _id: String,
+  user_id: Number,
   name: String,
   message: String
 }))
 
 export const ChatFlows = mongoose.model('chatflows', new Schema({
   _id: String,
+  user_id: Number,
   name: String,
   description: String
 }))
 
 export const Journeys = mongoose.model('journeys', new Schema({
   _id: String,
-  chatflow_id: mongoose.Types.ObjectId,
-  current_state: mongoose.Types.ObjectId,
-  next_state: mongoose.Types.ObjectId,
+  user_id: Number,
+  chatflow_id: String,
+  current_state: String,
+  next_state: String,
   option: String
 }))
