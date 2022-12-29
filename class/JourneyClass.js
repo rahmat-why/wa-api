@@ -28,8 +28,9 @@ export default class JourneyClass {
   /* <------------ Create, Read, Update, Delete ------------> */
 
   async storeJourney() {
+    const journey_id = "JRN"+randomBytes(3).toString('hex')
     return await Journeys.create({
-      _id: this.journey_id ?? randomBytes(12).toString('hex'),
+      journey_id: journey_id,
       user_id: this.user_id,
       chatflow_id: this.chatflow_id,
       current_state: this.current_state,
@@ -38,9 +39,9 @@ export default class JourneyClass {
     })
   }
 
-  async getAllJourney() { return await Journeys.find({user_id: this.user_id}).exec() }
+  async showJourney() { return await Journeys.find({user_id: this.user_id}).exec() }
 
-  async getJourney() { return await Journeys.findById(this.journey_id).exec() }
+  async getJourney() { return await Journeys.findOne({journey_id: this.journey_id}).exec() }
 
   /* async getJourneyByChatflowId() { return await Journeys.findOne({ chatflow_id: this.chatflow_id }).exec() }
 
@@ -49,7 +50,7 @@ export default class JourneyClass {
   async getJourneyByNextState() { return await Journeys.findOne({ next_state: this.next_state }).exec() } */
 
   async updateJourney(chatflow_id, current_state, next_state, option) {
-    return await Journeys.findByIdAndUpdate(this.journey_id, {
+    return await Journeys.findOneAndUpdate({journey_id: this.journey_id}, {
       chatflow_id: chatflow_id,
       current_state: current_state,
       next_state: next_state,
@@ -58,6 +59,6 @@ export default class JourneyClass {
     }, { new: true }).exec()
   }
 
-  async deleteJourney() { return await Journeys.findByIdAndDelete(this.journey_id, { new: true }).exec() }
+  async deleteJourney() { return await Journeys.findOneAndDelete({journey_id: this.journey_id}, { new: true }).exec() }
 
 }

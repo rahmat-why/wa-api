@@ -5,10 +5,10 @@ export async function journeyValidator(req, res, next) {
 
   let { id: user_id } = req.verified_token
   let { chatflow_id, current_state, next_state } = req.body
-  let { id } = req.params
+  let { journey_id } = req.params
 
   try {
-    const journey = await Journeys.findById(id)
+    const journey = await Journeys.findOne({journey_id: journey_id})
     if (journey) {
       if (journey.user_id === user_id) {
         chatflow_id ??= journey.chatflow_id
@@ -18,7 +18,7 @@ export async function journeyValidator(req, res, next) {
       }
       return response(res, 403, false, "You don't have permission to access this journey")
     } else {
-      return response(res, 404, false, `No journey associated with id: ${id}`)
+      return response(res, 404, false, `No journey associated with id: ${journey_id}`)
     }
   } catch(err) {
     console.error(err)
@@ -32,13 +32,13 @@ export async function keyValidator(req, res, next) {
 
   try {
 
-    if (!(await ChatFlows.findOne({ _id: chatflow_id, user_id: user_id })))
+    if (!(await ChatFlows.findOne({ chatflow_id: chatflow_id, user_id: user_id })))
       return response(res, 403, false, `You don't have any chatflow with id: ${chatflow_id}`)
 
-    if (!(await States.findOne({ _id: current_state, user_id: user_id })))
+    if (!(await States.findOne({ state_id: current_state, user_id: user_id })))
       return response(res, 403, false, `You don't have any state with id: ${current_state}`)
     
-    if (!(await States.findOne({ _id: next_state, user_id: user_id })))
+    if (!(await States.findOne({ state_id: next_state, user_id: user_id })))
       return response(res, 403, false, `You don't have any state with id: ${next_state}`)
 
     next()

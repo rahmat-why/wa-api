@@ -1,12 +1,11 @@
 import response from '../response.js'
 import JourneyClass from '../class/JourneyClass.js'
 
-export async function createJourney(req, res) {
+export async function storeJourney(req, res) {
   const { id: user_id } = req.verified_token
-  let { id, chatflow_id, current_state, next_state, option } = req.body
+  let { chatflow_id, current_state, next_state, option } = req.body
   try {
     const doc = await new JourneyClass()
-      .setJourneyId(id)
       .setUserId(user_id)
       .setChatFlowId(chatflow_id)
       .setCurrentState(current_state)
@@ -20,12 +19,12 @@ export async function createJourney(req, res) {
   }
 }
 
-export async function getAllJourney(req, res) {
+export async function showJourney(req, res) {
   const { id: user_id } = req.verified_token
   try {
     const doc = await new JourneyClass()
       .setUserId(user_id)
-      .getAllJourney()
+      .showJourney()
     return response(res, 200, true, 'Successfully retrieve all journey', doc.map(e => e.toObject()))
   } catch (err) {
     console.error(err)
@@ -34,10 +33,10 @@ export async function getAllJourney(req, res) {
 }
 
 export async function getJourney(req, res) {
-  let { id } = req.params
+  let { journey_id } = req.params
   try {
     const doc = await new JourneyClass()
-      .setJourneyId(id)
+      .setJourneyId(journey_id)
       .getJourney()
     return response(res, 200, true, 'Successfully retrieve journey', doc.toObject())
   } catch (err) {
@@ -47,11 +46,11 @@ export async function getJourney(req, res) {
 }
 
 export async function updateJourney(req, res) {
-  let { id } = req.params
+  let { journey_id } = req.params
   let { chatflow_id, current_state, next_state, option } = req.body
   try {
     const doc = await new JourneyClass()
-      .setJourneyId(id)
+      .setJourneyId(journey_id)
       .updateJourney(chatflow_id, current_state, next_state, option)
     return response(res, 200, true, 'Successfully update journey', doc.toObject())
   } catch (err) {
@@ -61,10 +60,10 @@ export async function updateJourney(req, res) {
 }
 
 export async function deleteJourney(req, res) {
-  let { id } = req.params
+  let { journey_id } = req.params
   try {
     const doc = await new JourneyClass()
-      .setJourneyId(id)
+      .setJourneyId(journey_id)
       .deleteJourney()
     return response(res, 200, true, 'Successfully delete journey', doc.toObject())
   } catch (err) {
