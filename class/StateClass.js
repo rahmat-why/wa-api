@@ -24,30 +24,31 @@ export default class StateClass {
   /* <------------ Create, Read, Update, Delete ------------> */
 
   async storeState() {
+    var state_id = "STATE"+randomBytes(5).toString('hex')
     return await States.create({
-      _id: this.state_id ?? randomBytes(12).toString('hex'),
+      state_id: state_id,
       user_id: this.user_id,
       name: this.name,
       message: this.message
     })
   }
 
-  async getAllState() { return await States.find({ user_id: this.user_id }).exec() }
+  async showState() { return await States.find({ user_id: this.user_id }).exec() }
 
-  async getState() { return await States.findById(this.state_id).exec() }
+  async getState() { return await States.findOne({ state_id: this.state_id }).exec() }
 
   async updateState(name, message) {
     if (!(name && message)) {
       let doc = await this.getState()
-      return await States.findByIdAndUpdate(this.state_id, {
+      return await States.findOneAndUpdate({ state_id: this.state_id }, {
         name: doc.name ?? name,
         message: doc.message ?? message,
         $inc: { __v: 1 }
       }, { new: true }).exec()
     }
-    return await States.findByIdAndUpdate(this.state_id, { name, message, $inc: { __v: 1 }}, { new: true }).exec()
+    return await States.findOneAndUpdate({ state_id: this.state_id }, { name, message, $inc: { __v: 1 }}, { new: true }).exec()
   }
 
-  async deleteState() { return await States.findByIdAndDelete(this.state_id).exec() }
+  async deleteState() { return await States.findOneAndDelete({ state_id: this.state_id }).exec() }
 
 }

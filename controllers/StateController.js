@@ -1,12 +1,11 @@
 import response from '../response.js'
 import StateClass from '../class/StateClass.js'
 
-export async function createState(req, res) {
+export async function storeState(req, res) {
   const { id: user_id } = req.verified_token
-  let { id, name, message } = req.body
+  let { name, message } = req.body
   try {
     const doc = await new StateClass()
-      .setStateId(id)
       .setUserId(user_id)
       .setName(name)
       .setMessage(message)
@@ -18,12 +17,12 @@ export async function createState(req, res) {
   }
 }
 
-export async function getAllState(req, res) {
+export async function showState(req, res) {
   const { id: user_id } = req.verified_token
   try {
     const doc = await new StateClass()
       .setUserId(user_id)
-      .getAllState()
+      .showState()
     return response(res, 200, true, 'Successfully retrieve all state', doc.map(e => e.toObject()))
   } catch (err) {
     console.error(err)
@@ -32,10 +31,10 @@ export async function getAllState(req, res) {
 }
 
 export async function getState(req, res) {
-  let { id } = req.params
+  let { state_id } = req.params
   try {
     const doc = await new StateClass()
-      .setStateId(id)
+      .setStateId(state_id)
       .getState()
     return response(res, 200, true, 'Successfully retrieve state', doc.toObject())
   } catch (err) {
@@ -45,11 +44,11 @@ export async function getState(req, res) {
 }
 
 export async function updateState(req, res) {
-  let { id } = req.params
+  let { state_id } = req.params
   let { name, message } = req.body
   try {
     const doc = await new StateClass()
-      .setStateId(id)
+      .setStateId(state_id)
       .updateState(name, message)
     return response(res, 200, true, 'Successfully update state', doc.toObject())
   } catch (err) {
@@ -59,10 +58,10 @@ export async function updateState(req, res) {
 }
 
 export async function deleteState(req, res) {
-  let { id } = req.params
+  let { state_id } = req.params
   try {
     const doc = await new StateClass()
-      .setStateId(id)
+      .setStateId(state_id)
       .deleteState()
     return response(res, 200, true, 'Successfully delete state', doc.toObject())
   } catch (err) {
