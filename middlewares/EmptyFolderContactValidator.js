@@ -1,19 +1,23 @@
 import response from './../response.js'
-import ContactClass from '../class/ContactClass.js'
+import FolderContactClass from '../class/FolderContactClass.js'
 
 export async function validate(req, res, next) {
 
-  const { folder_id } = req.params
+  const { folder_id: folder_contact_id } = req.params
 
   try {
 
-    if (await new ContactClass().setFolderId(folder_id).isExistFolder()) next()
+    let isFolderExist = await new FolderContactClass()
+      .setFolderContactId(folder_contact_id)
+      .isExistFolder()
+
+    if (isFolderExist) next()
     else return response(res, 404, false, "Folder not found")
 
   } catch(err) {
 
     console.error(err)
-    return response(res, 401, false, err.message, {})
+    return response(res, 500, false, err.message, {})
 
   }
 

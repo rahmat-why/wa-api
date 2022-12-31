@@ -1,151 +1,106 @@
 import response from '../response.js'
+import FolderContactClass from '../class/FolderContactClass.js'
 import ContactClass from '../class/ContactClass.js'
-import { Folder, Contact } from '../models/MySQLModel.js'
 
-export async function storeFolder(req, res) {
+export async function storeFolderContact(req, res) {
 
-  const {name} = req.body
-  const {id} = req.verified_token
+  let { name } = req.body
+  let { id: user_id } = req.verified_token
 
   try {
 
-    const contact = new ContactClass()
-      .setFolderUserId(id)
-      .setFolderName(name)
+    let folder = new FolderContactClass()
+      .setUserId(user_id)
+      .setName(name)
 
-    if (await contact.isUsedFolderName())
-      return response(res, 422, false, "This folder already exist!")
-  
-    await contact.storeFolder()
-    return response(res, 200, true, "Folder created successfully!")
+    if (await folder.isUsedFolderName())
+      return response(res, 409, false, "This folder already exist!")
+
+    await folder.storeFolder()
+    return response(res, 201, true, "Folder created successfully!")
 
   } catch (err) {
 
     console.error(err)
-    return response(res, 401, false, err.message, {})
+    return response(res, 500, false, err.message, {})
 
   }
 
 }
 
-export async function showFolder(req, res) {
+export async function showFolderContact(req, res) {
+  
+  let { id: user_id } = req.verified_token
 
   try {
 
-    let Folders = await Folder.findAll({
-      where: {
-        user_id: req.verified_token.id,
-        is_active: 1
-      }
-    })
+    let folders = await new FolderContactClass()
+      .setUserId(user_id)
+      .getAllFolder()
 
-    if (Folders.length > 0) {
+      console.log(user_id)
+    console.log(folders)
 
-      return response(res, 200, true, "Folder contact found!",
-        Folders.map(({folder_contact_id, name: title}) => {
-          return { folder_contact_id, title }
-        })
-      )
+    if (folders.length === 0) return response(res, 404, true, "No folders were created yet!")
 
-    } else {
-
-      return response(res, 422, true, "No folders were created yet!")
-
-    }
+    let data = folders.map(({ folder_contact_id, name: title }) =>  ({ folder_contact_id, title }))
+    return response(res, 200, true, "Folder contact found!", data)
 
   } catch (err) {
 
     console.error(err)
-    return response(res, 401, false, err.message)
+    return response(res, 500, false, err.message)
 
   }
 
 }
 
-export async function getFolder(req, res) {
+export async function getFolderContact(req, res) {
+
+  let { folder_id: folder_contact_id } = req.params
 
   try {
 
-    const { folder_id } = req.params
-  
-    let contacts = await Contact.findAll({ where: {folder_contact_id: folder_id} })
+    let data = (await new ContactClass()
+      .setFolderContactId(folder_contact_id)
+      .getContactWithinFolder())
+      .map(({ contact_id, name, telp }) => ({ contact_id, name, telp }))
+      
+    return response(res, 200, true, "Folder contact found!", data)
 
-    return response(res, 200, true, "Folder contact found!",
-      contacts.map(({contact_id, name, telp}) => {
-        return { contact_id, name, telp }
-      })
-    )
-
-  } catch(err) {
+  } catch (err) {
 
     console.error(err)
-    return response(res, 401, false, err.message)
+    return response(res, 500, false, err.message)
 
   }
 
 }
 
-export async function deleteFolder(req, res) {
+export async function deleteFolderContact(req, res) {
+
+  let { folder_id: folder_contact_id } = req.params
 
   try {
 
-    const { folder_id } = req.params
+    let contacts = await new ContactClass()
+      .setFolderContactId(folder_contact_id)
+      .getContactWithinFolder()
 
-    if (await Contact.findOne({ where: { folder_contact_id: folder_id } })) {
-
+    if (contacts.length > 0)
       return response(res, 422, false, "This folder has no empty contact!")
 
-    } else {
+    await new FolderContactClass()
+      .setFolderContactId(folder_contact_id)
+      .softDeleteFolder()
 
-      await new ContactClass()
-        .setFolderId(folder_id)
-        .updateFolder({is_active: 0})
+    return response(res, 200, true, "Folder deleted successfully!")
 
-      return response(res, 200, true, "Folder deleted successfully!")
-
-    }
-
-  } catch(err) {
+  } catch (err) {
 
     console.error(err)
-    return response(res, 401, false, err.message)
+    return response(res, 500, false, err.message)
 
   }
 
 }
-
-/* export async function deleteContact(req, res) {
-
-  try {
-
-    const { folder_id } = req.params
-    const folder = await Folder.findOne({ where: { folder_contact_id: folder_id, is_active: 1 } })
-
-    if ( folder ) {
-
-      if (await Contact.findOne({ where: { folder_contact_id: folder_id } })) {
-  
-        return response(res, 422, false, "This folder has no empty contact!")
-  
-      } else {
-
-        await new ContactClass()
-        .setFolderId(folder_id)
-        .updateFolder(folder.name, 0, folder.user_id)
-
-        return response(res, 200, true, "Folder deleted successfully!")
-  
-      }
-
-    } else {
-
-      return response(res, 422, false, "This folder not exist!")
-
-    }
-
-  } catch(err) {
-    return response(res, 401, false, err.message)
-  }
-
-}
-*/

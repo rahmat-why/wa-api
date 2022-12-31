@@ -4,14 +4,11 @@ import nodeCleanup from 'node-cleanup'
 import routes from './routes.js'
 import { init, cleanup } from './whatsapp.js'
 import cors from 'cors'
-import mongoDbConnect from './config/MongoDB.js'
 
 const app = express()
 
 const host = process.env.HOST || undefined
 const port = parseInt(process.env.PORT ?? 3005)
-
-mongoDbConnect().then(() => console.log('connection to MongoDB have been established'))
 
 app.use(cors())
 app.use(express.urlencoded({ extended: true }))

@@ -1,40 +1,26 @@
-import { Contact, Folder } from '../models/MySQLModel.js'
 import crypto from 'crypto'
+import { Contacts } from '../models/MongoDBModel.js'
 
-const contact_class = class ContactClass {
+export default class ContactClass {
   constructor() {
     this.contact_id = null
-    this.folder_id = null
-    this.folder_name = null
-    this.folder_user_id = null
-    this.is_folder_active = null
+    this.folder_contact_id = null
     this.name = null
     this.telp = null
     this.profile_picture = null
   }
+
+
+
+  /* <------------ Define ------------> */
 
   setContactId(contact_id) {
     this.contact_id = contact_id
     return this
   }
 
-  setFolderId(id) {
-    this.folder_id = id
-    return this
-  }
-
-  setFolderName(name) {
-    this.folder_name = name
-    return this
-  }
-
-  setFolderUserId(id) {
-    this.folder_user_id = id
-    return this
-  }
-
-  toggleFolder(bool) {
-    this.is_folder_active = Boolean(num)
+  setFolderContactId(folder_contact_id) {
+    this.folder_contact_id = folder_contact_id
     return this
   }
 
@@ -43,108 +29,67 @@ const contact_class = class ContactClass {
     return this
   }
 
-  setTelp(no) {
-    this.telp = no
+  setTelp(telp) {
+    this.telp = telp
     return this
   }
 
-  setProfilePicture(img) {
-    this.profile_picture = img
+  setProfilePicture(profile_picture) {
+    this.profile_picture = profile_picture
     return this
   }
 
-  /* async getContact() {
-    const contact = await Contact.findOne({
-      where: { name: this.name }
-    })
 
-    return contact
-  }
+
+  /* <------------ Create, Read, Update, Delete ------------> */
 
   async storeContact() {
-    await Contact.create({
-      contact_id: this.contact_id,
+    return await Contacts.create({
+      contact_id: `CNT${crypto.randomBytes(3).toString('hex')}`,
       folder_contact_id: this.folder_contact_id,
       name: this.name,
       telp: this.telp,
-      profile_picture: this.profile_picture
-    })
-
-    return true
-  } */
-
-  async getAllFolder() {
-    return await FolderContact.findAll({
-      where: {
-        user_id: this.folder_user_id,
-        is_active: 1
-      } 
+      profile_picture: this.profile_picture,
     })
   }
 
-  async getFolder() {
-    return await FolderContact.findOne({
-      where: {
-        user_id: this.folder_user_id,
-        folder_id: this.folder_id,
-        is_active: 1
-      }
+  async getContact() {
+    return await Contacts.findOne({
+      contact_id: this.contact_id
     })
   }
 
-  async storeFolder() {
-    
-    let folder_contact_id = crypto.randomBytes(5).toString('hex')
-  
-    while (await Folder.findOne({ where: { folder_contact_id } })) {
-      folder_contact_id = crypto.randomBytes(5).toString('hex')
-    }
-
-    await Folder.create({
-      folder_contact_id,
-      name: this.folder_name,
-      is_active: 1,
-      user_id: this.folder_user_id
-    })
-
-    return true
-  }
-
-  async updateFolder(update) {
-    await Folder.update(update, {
-      where: { 
-        folder_contact_id: this.folder_id
-      } 
+  async getContactWithinFolder() {
+    return await Contacts.find({
+      folder_contact_id: this.folder_contact_id
     })
   }
 
-  async isExistFolder() {
-
-    const folder = await Folder.findOne({
-      where: {
-        folder_contact_id: this.folder_id,
-        is_active: 1
-      }
-    })
-    
-    if (folder ?? false) return true
-    else return false
+  async updateContact(update) {
+    return await Contacts.updateOne({
+      contact_id: this.contact_id,
+    }, { ...update, $inc: { __v: 1 } }, { new: true })
   }
 
-  async isUsedFolderName() {
-
-    const folder = await Folder.findOne({
-      where: {
-        user_id: this.folder_user_id,
-        name: this.folder_name,
-        is_active: 1
-      }
+  async deleteContact() {
+    return await Contacts.deleteOne({
+      contact_id: this.contact_id,
     })
+  }
 
-    if (folder ?? false) return true
-    else return false
+
+
+
+
+  async isExistContact() {
+
+    return (await Contacts.findOne({ contact_id: this.contact_id }) ? true : false)
+
+  }
+
+  async isUsedContactName() {
+
+    return (await Contacts.findOne({ name: this.name }) ? true : false)
 
   }
 }
-
-export default contact_class
