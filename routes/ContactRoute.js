@@ -1,12 +1,17 @@
 import { Router } from 'express'
-import * as contact from '../controllers/ContactController.js'
-import validate from '../middlewares/EmptyFolderContactValidator.js'
+import {
+  storeFolderContact,
+  showFolderContact,
+  getFolderContact,
+  deleteFolderContact
+} from '../controllers/ContactController.js'
+import validate from '../middlewares/FolderContactValidator.js'
 
 const router = new Router()
 
-router.post('/store-folder', contact.storeFolder)
-router.get('/show-folder', contact.showFolder)
-router.get('/show-folder/:folder_id', validate, contact.getFolder)
-router.delete('/delete-folder/:folder_id', validate, contact.deleteFolder)
+router.post('/store-folder', storeFolderContact)
+router.get('/show-folder',  showFolderContact)
+router.get('/show-folder/:folder_id', validate, getFolderContact)
+router.delete('/delete-folder/:folder_id', validate, deleteFolderContact)
 
 export default router

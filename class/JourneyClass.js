@@ -51,10 +51,10 @@ export default class JourneyClass {
 
   async updateJourney(chatflow_id, current_state, next_state, option) {
     return await Journeys.findOneAndUpdate({journey_id: this.journey_id}, {
-      chatflow_id: chatflow_id,
-      current_state: current_state,
-      next_state: next_state,
-      option: option,
+      chatflow_id,
+      current_state,
+      next_state,
+      option,
       $inc: { __v: 1 }
     }, { new: true }).exec()
   }

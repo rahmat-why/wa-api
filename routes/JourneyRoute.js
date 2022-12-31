@@ -4,10 +4,10 @@ import { journeyValidator, keyValidator } from '../middlewares/JourneyValidator.
 
 const router = new Router()
 
-router.get    ('/show-journey', showJourney)
-router.post    ('/store-journey', keyValidator, storeJourney)
-router.get    ('/get-journey/:journey_id', journeyValidator, getJourney)
-router.put   ('/update-journey/:journey_id', journeyValidator, keyValidator, updateJourney)
-router.delete ('/delete-journey/:journey_id', journeyValidator, deleteJourney)
+router.get('/show-journey', showJourney)
+router.post('/store-journey', keyValidator, storeJourney)
+router.get('/get-journey/:journey_id', journeyValidator, getJourney)
+router.put('/update-journey/:journey_id', journeyValidator, keyValidator, updateJourney)
+router.delete('/delete-journey/:journey_id', journeyValidator, deleteJourney)
 
 export default router
