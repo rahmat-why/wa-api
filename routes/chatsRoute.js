@@ -29,6 +29,4 @@ router.post(
 
 router.post('/check-number', body('receiver').notEmpty(), requestValidator, sessionValidator, controller.checkNumber)
 
-router.post('/formatted-response', controller.formattedResponse)
-
 export default router
