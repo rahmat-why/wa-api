@@ -55,7 +55,7 @@ export async function showFolderContact(req, res) {
 
 }
 
-export async function getFolderContact(req, res) {
+export async function showContact(req, res) {
 
   let { folder_id: folder_contact_id } = req.params
 

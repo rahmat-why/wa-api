@@ -8,11 +8,17 @@ export default class ContactClass {
     this.name = null
     this.telp = null
     this.profile_picture = null
+    this.user_id = null
   }
 
 
 
   /* <------------ Define ------------> */
+
+  setUserId(user_id) { 
+    this.user_id = user_id; 
+    return this 
+  }
 
   setContactId(contact_id) {
     this.contact_id = contact_id
@@ -45,7 +51,8 @@ export default class ContactClass {
 
   async storeContact() {
     return await Contacts.create({
-      contact_id: `CNT${crypto.randomBytes(3).toString('hex')}`,
+      contact_id: `CNT${randomBytes(3).toString('hex')}`,
+      user_id: this.user_id,
       folder_contact_id: this.folder_contact_id,
       name: this.name,
       telp: this.telp,

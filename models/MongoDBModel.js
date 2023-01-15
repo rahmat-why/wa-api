@@ -48,6 +48,24 @@ export const Folders = mongoose.model('folder_contacts', new Schema({
   is_active: Boolean
 }))
 
+export const Schedules = mongoose.model('schedules', new Schema({
+  scheduleId: String,
+  title: String,
+  totalReceiver: Number,
+  userId: Number,
+  createFrom: String,
+  folderId: String
+}))
+
+export const ScheduleReceivers = mongoose.model('schedule_receivers', new Schema({
+  scheduleId: String,
+  deviceId: String,
+  telp: String,
+  category: String,
+  scheduleTime: String,
+  message: String
+}))
+
 export const Contacts = mongoose.model('contacts', new Schema({
   contact_id: {
     type: String,
@@ -55,7 +73,7 @@ export const Contacts = mongoose.model('contacts', new Schema({
     unique: true
   },
   user_id: Number,
-  folder_contact_id: String,
+  folder_contact_id: Array,
   name: String,
   telp: String,
   profile_picture: String

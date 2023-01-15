@@ -17,7 +17,7 @@ import response from './response.js'
 const router = Router()
 
 router.use('/sessions', DeviceValidator, sessionsRoute)
-router.use('/chats', DeviceValidator, chatsRoute)
+router.use('/chats', AuthValidator, DeviceValidator, chatsRoute)
 router.use('/groups', groupsRoute)
 router.use('/auth', AuthRoute)
 router.use('/device', AuthValidator, DeviceRoute)

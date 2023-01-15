@@ -2,8 +2,8 @@ import { Router } from 'express'
 import {
   storeFolderContact,
   showFolderContact,
-  getFolderContact,
-  deleteFolderContact
+  deleteFolderContact,
+  showContact
 } from '../controllers/ContactController.js'
 import validate from '../middlewares/FolderContactValidator.js'
 
@@ -11,7 +11,8 @@ const router = new Router()
 
 router.post('/store-folder', storeFolderContact)
 router.get('/show-folder',  showFolderContact)
-router.get('/show-folder/:folder_id', validate, getFolderContact)
 router.delete('/delete-folder/:folder_id', validate, deleteFolderContact)
+
+router.get('/show-contact/:folder_id', validate, showContact)
 
 export default router
