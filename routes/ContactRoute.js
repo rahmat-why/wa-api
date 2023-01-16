@@ -1,18 +1,22 @@
 import { Router } from 'express'
+import multer from 'multer'
 import {
   storeFolderContact,
   showFolderContact,
   deleteFolderContact,
-  showContact
+  showContact,
+  importContact
 } from '../controllers/ContactController.js'
-import validate from '../middlewares/FolderContactValidator.js'
+import EmptyFolderContactValidator from './../middlewares/EmptyFolderContactValidator.js'
 
-const router = new Router()
+const router = Router()
+const upload = multer({ dest: 'csv/' })
 
 router.post('/store-folder', storeFolderContact)
 router.get('/show-folder',  showFolderContact)
-router.delete('/delete-folder/:folder_id', validate, deleteFolderContact)
+router.delete('/delete-folder/:folder_id', EmptyFolderContactValidator, deleteFolderContact)
 
-router.get('/show-contact/:folder_id', validate, showContact)
+router.get('/show-contact/:folder_id', EmptyFolderContactValidator, showContact)
+router.post('/import-contact', upload.single('template'), importContact)
 
 export default router

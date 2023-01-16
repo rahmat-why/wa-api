@@ -178,12 +178,16 @@ const showSchedule = async (req, res) => {
 
 const showDetailSchedule = async (req, res) => {
     const { schedule_id } = req.params
-    const detailSchedule = await new ChatClass().showDetailSchedule(schedule_id)
+
+    const detailSchedule = 
+        await new ChatClass()
+        .setScheduleId(schedule_id)
+        .showDetailSchedule()
 
     return response(res, 200, true, 'Detail schedule found!.', detailSchedule)
 }
 
-const storeSchedule = async (req, res) => {
+const importSchedule = async (req, res) => {
     const {title, create_form, folder_id} = req.body
     if(!req.file) {
       return response(res, 422, false, "Template required!", {})
@@ -274,82 +278,4 @@ const storeSchedule = async (req, res) => {
     })
 }
 
-const showContact = async (req, res) => {
-    try {
-      const contacts = await new ChatClass().setFolderId(req.params.folder_id).showContact()
-      return res.send(contacts)
-    } catch (err) {
-      return res.status(403).send({ message: err.message })
-    }
-}
-
-const storeContact = async (req, res) => {
-  const {folder_id} = req.body
-  const { id: user_id } = req.verified_token
-  if(!req.file) {
-    return response(res, 422, false, "Template required!", {})
-  }
-
-  const csvFilePath = join(process.cwd(), req.file.path)
-  const results = []
-  const contacts = []
-  const errors = [];
-
-  createReadStream(csvFilePath).pipe(csv())
-    .on('data', (data) => {
-      if(!data.telp || !data.name || data.telp == null || data.name == null){
-        errors.push(data);
-      }else{
-        results.push(data)
-      }
-    })
-    .on('end', async () => {
-      if(errors.length > 0) {
-        return response(res, 422, false, "File must contain telp & name!", {})
-      }
-
-      try {
-        for (const result of results) {
-          const formatted_telp = new AuthClass()
-            .normalizeTelp(result.telp)
-
-          const validWhatsappNumber = await new DeviceClass()
-            .setTelp(formatted_telp)
-            .isValidWhatsappNumber()
-          
-          if (!validWhatsappNumber) {
-            continue
-          } 
-
-          var contact = new ChatClass()
-            .setUserId(user_id)
-            .setTelp(formatted_telp)
-            .setName(result.name)
-            .setProfilePicture(result.profile_picture)
-            .setFolderId(folder_id)
-          
-          const is_exist_contact = await contact.getContact()
-          if (is_exist_contact) {
-            if (!is_exist_contact.folder_contact_id.includes(contact.folder_id)) {
-              var contact = await contact.addContactFolder()
-            }else {
-              var contact = is_exist_contact
-            }
-          }else{
-            var contact = await contact.storeContact()
-          }
-          contacts.push(contact)
-        }
-
-        return response(res, 200, true, 'Contact imported successfully!', contacts)
-
-      } catch (err) {
-        return response(res, 422, false, err.message, {})
-      }
-    })
-    .on('error', (err) => {
-      return response(res, 422, false, err.message, {})
-    })
-}
-
-export { getList, send, sendBulk, checkNumber, formattedResponse, showSchedule, showDetailSchedule, storeSchedule, showContact, storeContact }
+export { getList, send, sendBulk, checkNumber, formattedResponse, showSchedule, showDetailSchedule, importSchedule }

@@ -1,4 +1,5 @@
 import crypto from 'crypto'
+import { randomBytes } from 'crypto'
 import { Contacts } from '../models/MongoDBModel.js'
 
 export default class ContactClass {
@@ -10,8 +11,6 @@ export default class ContactClass {
     this.profile_picture = null
     this.user_id = null
   }
-
-
 
   /* <------------ Define ------------> */
 
@@ -49,6 +48,11 @@ export default class ContactClass {
 
   /* <------------ Create, Read, Update, Delete ------------> */
 
+  async showContact() {
+    const contacts = await Contacts.find({ folder_contact_id: { $in: this.folder_id }})
+    return contacts
+  }  
+
   async storeContact() {
     return await Contacts.create({
       contact_id: `CNT${randomBytes(3).toString('hex')}`,
@@ -61,9 +65,8 @@ export default class ContactClass {
   }
 
   async getContact() {
-    return await Contacts.findOne({
-      contact_id: this.contact_id
-    })
+    const contact = await Contacts.findOne({ telp: this.telp })
+    return contact
   }
 
   async getContactWithinFolder() {
@@ -84,19 +87,21 @@ export default class ContactClass {
     })
   }
 
+  async addContactFolder() {
+    const contact = await Contacts.findOneAndUpdate(
+      { telp: this.telp },
+      { $push: { folder_contact_id: this.folder_contact_id }},
+      { new: true }
+    )
 
-
-
+    return contact
+  }
 
   async isExistContact() {
-
     return (await Contacts.findOne({ contact_id: this.contact_id }) ? true : false)
-
   }
 
   async isUsedContactName() {
-
     return (await Contacts.findOne({ name: this.name }) ? true : false)
-
   }
 }

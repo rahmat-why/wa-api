@@ -21,8 +21,6 @@ const chat_class = class ChatClass {
         this.create_form = null,
         this.folder_id = null,
         this.total_receiver = null,
-        this.name = null,
-        this.profile_picture = null,
         this.token = null
     }
 
@@ -270,11 +268,9 @@ const chat_class = class ChatClass {
         return schedules
     }
 
-    async showDetailSchedule(schedule_id) {
+    async showDetailSchedule() {
         try {
-            const detailSchedule = await ScheduleReceivers.find({ 
-              scheduleId: mongoose.Types.ObjectId(schedule_id) 
-            }) 
+            const detailSchedule = await ScheduleReceivers.find({ scheduleId: { $in: this.schedule_id }})
             
             return detailSchedule
         } catch(err) {
@@ -331,40 +327,6 @@ const chat_class = class ChatClass {
 
     getExtension(url) {
         return url.split(/[#?]/)[0].split('.').pop().trim()
-    }
-
-    async showContact() {
-        const contacts = await Contacts.find({ folder_contact_id: { $in: this.folder_id }})
-        return contacts
-    }  
-
-    async getContact() {
-        const contact = await Contacts.findOne({ telp: this.telp })
-        return contact
-    }
-
-    async storeContact() {
-        const contact = await new Contacts({
-            contact_id: `CNT${randomBytes(3).toString('hex')}`,
-            user_id: this.user_id,
-            telp: this.telp,
-            name: this.name,
-            profile_picture: this.profile_picture,
-            folder_contact_id: [this.folder_id]
-        })
-        .save()
-
-        return contact
-    }
-
-    async addContactFolder() {
-        const contact = await Contacts.findOneAndUpdate(
-          { telp: this.telp },
-          { $push: { folder_contact_id: this.folder_id }},
-          { new: true }
-        )
-
-        return contact
     }
 }
 

@@ -3,7 +3,11 @@ import FolderContactClass from '../class/FolderContactClass.js'
 
 export async function validate(req, res, next) {
 
-  const { folder_id: folder_contact_id } = req.params
+  if (req.body.folder_id) {
+    var folder_contact_id = req.body.folder_id
+  }else if(req.params.folder_id) {
+    var folder_contact_id = req.params.folder_id
+  }
 
   try {
 
