@@ -27,7 +27,7 @@ router.post(
     controller.sendBulk
 )
 
-router.post('/check-number', body('receiver').notEmpty(), requestValidator, sessionValidator, controller.checkNumber)
+router.post('/check-number', body('receiver').notEmpty(), requestValidator, controller.checkNumber)
 
 router.get('/show-schedule', controller.showSchedule)
 router.get('/show-detail-schedule/:schedule_id', controller.showDetailSchedule)
