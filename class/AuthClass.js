@@ -165,7 +165,7 @@ const auth_class = class AuthClass {
     }
 
     async registerLog() {
-        const response = await axios.post('http://localhost:8080/register', {
+        const response = await axios.post('https://log.angel-ping.my.id/register', {
             "name": this.telp,
             "password": this.password
         },{
