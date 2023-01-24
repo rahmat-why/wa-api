@@ -18,6 +18,7 @@ import fs from 'fs'
 import { URL, parse } from 'url';
 
 import ChatClass from './class/ChatClass.js'
+import AuthClass from './class/AuthClass.js'
 import DeviceClass from './class/DeviceClass.js'
 import ConfigClass from './class/ConfigClass.js'
 
@@ -110,6 +111,11 @@ const createSession = async (sessionId, isLegacy = false, res = null) => {
                 return false
             }
 
+            var device = 
+                await new DeviceClass()
+                .setDeviceId(sessionId)
+                .getDevice()
+
             if(remote === "s.whatsapp.net"){
                 var formatted_response_chat = 
                     await new ChatClass()
@@ -117,10 +123,17 @@ const createSession = async (sessionId, isLegacy = false, res = null) => {
                     .setMessage(message)
                     .formatWebhookChat()
 
+                var get_user = 
+                    await new AuthClass()
+                    .setId(device.user_id)
+                    .getUserById()
+
                 var store_log = 
                     await new ChatClass()
                     .setResponse(formatted_response_chat)
+                    .setTokenLog(get_user.token_log)
                     .storeLog()
+
             }else if(remote === "g.us"){
                 var formatted_response_chat = 
                     await new ChatClass()
@@ -128,19 +141,20 @@ const createSession = async (sessionId, isLegacy = false, res = null) => {
                     .setMessage(message)
                     .formatWebhookGroup()
 
+                var get_user = 
+                    await new AuthClass()
+                    .setId(device.user_id)
+                    .getUserById()
+
                 var store_log = 
                     await new ChatClass()
                     .setResponse(formatted_response_chat)
+                    .setTokenLog(get_user.token_log)
                     .storeLog()
             }
 
             if (!message.key.fromMe) {
                 await delay(1000)
-
-                let device = 
-                    await new DeviceClass()
-                    .setDeviceId(sessionId)
-                    .getDevice()
 
                 if (device === null) {
                     return false
