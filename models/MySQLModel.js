@@ -11,7 +11,8 @@ export const User = database.define('users', {
     name: Sequelize.STRING,
     telp: Sequelize.STRING,
     password: Sequelize.STRING,
-    token: Sequelize.STRING
+    token: Sequelize.STRING,
+    token_log: Sequelize.STRING,
 });
 
 export const Device = database.define('devices', {

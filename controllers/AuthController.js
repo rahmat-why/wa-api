@@ -65,6 +65,17 @@ export const register = async(req, res) => {
             .setTelp(telp)
             .storeUser()
 
+        let register_log = 
+            await new AuthClass()
+            .setTelp(telp)
+            .setPassword(telp)
+            .registerLog()
+
+        let update_user = 
+            await new AuthClass()
+            .setTelp(telp)
+            .updateUser({token_log: register_log.token})
+
         return response(res, 200, true, 'OTP sent successfully via Whatsapp!', {})
     } catch (err) {
         let notification_error = 
@@ -130,8 +141,8 @@ export const verifyOtp = async(req, res) => {
             await new AuthClass()
             .setTelp(telp)
             .generateToken()
-
-        let update_token = 
+        
+        let update_user = 
             await new AuthClass()
             .setTelp(telp)
             .updateUser({token: generate_token.token})

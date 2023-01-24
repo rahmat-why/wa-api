@@ -207,7 +207,6 @@ const importSchedule = async (req, res) => {
       .setTitle(title)
       .setCreateForm(create_form)
       .setFolderId(folder_id)
-      .setToken(token)
       .storeSchedule()
 
     const csvFilePath = join(process.cwd(), req.file.path)
@@ -219,6 +218,12 @@ const importSchedule = async (req, res) => {
       .on('data', (data) => {
         var url_type = ["image", "document"]
         var text_type = ["text"]
+        
+        const today = new Date();
+        const schedule_at = new Date(data.schedule_at);
+        const diff_minutes = date.subtract(today, schedule_at).toMinutes();
+        console.log(diff_minutes)
+
         if(!data.type || !data.device_id || !data.telp || !data.schedule_at || data.type == "" || data.device_id == "" || data.telp == "" || data.schedule_at == ""){
           errors.push(data);
         }else if(url_type.includes(data.type) && data.url == ""){

@@ -3,14 +3,22 @@ import bcrypt from "bcrypt";
 import {
     User
 } from '../models/MySQLModel.js'
+import request from 'request';
+import axios from 'axios';
 import { getSession, isExists, sendMessage, formatPhone } from './../whatsapp.js'
 
 const auth_class = class AuthClass {
     constructor() {
+        this.id = null
         this.telp = null
         this.name = null
         this.password = null
         this.otp = null
+    }
+
+    setId(id) {
+        this.id = id
+        return this
     }
 
     setTelp(telp) {
@@ -60,6 +68,16 @@ const auth_class = class AuthClass {
             telp: this.telp,
             password: this.password
         })
+    }
+
+    async getUserById() {
+        const user = await User.findOne({
+            where: {
+                id: this.id
+            }
+        })
+
+        return user
     }
 
     async getUser() {
@@ -131,12 +149,32 @@ const auth_class = class AuthClass {
             var otp = "0000";
         }
 
-        const session = getSession(process.env.SESSION_ID)
-        const receiver = formatPhone(this.telp)
-    
-        await sendMessage(session, receiver, {text: "OTP anda "+otp}, 0)
+        const response = await axios.post('https://portal.angel-ping.my.id/chats/send', {
+            "receiver": this.telp,
+            "message": {
+                "text": "OTP anda "+otp
+            }
+        },{
+            headers: {
+                'angel-key': 'ECOM.c9dc7e39c892544e816',
+                'Content-Type': 'application/json'
+            }
+        });
 
         return otp
+    }
+
+    async registerLog() {
+        const response = await axios.post('http://localhost:8080/register', {
+            "name": this.telp,
+            "password": this.password
+        },{
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        return response.data
     }
 }
 

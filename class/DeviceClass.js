@@ -69,7 +69,7 @@ const device_class = class DeviceClass {
             where: {
                 device_id: this.device_id
             },
-            attributes: ['device_id', 'name', 'telp', 'api_key', 'webhook', 'webhook_group', 'expired_at', 'device_status']
+            attributes: ['device_id', 'name', 'telp', 'api_key', 'webhook', 'webhook_group', 'expired_at', 'device_status', 'user_id']
         })
 
         return device
@@ -80,7 +80,7 @@ const device_class = class DeviceClass {
             where: {
                 api_key: this.api_key
             },
-            attributes: ['device_id', 'name', 'telp', 'api_key', 'webhook', 'webhook_group', 'expired_at', 'device_status']
+            attributes: ['device_id', 'name', 'telp', 'api_key', 'webhook', 'webhook_group', 'expired_at', 'device_status', 'user_id']
         })
 
         return device
@@ -91,7 +91,7 @@ const device_class = class DeviceClass {
             where: {
                 telp: this.telp
             },
-            attributes: ['device_id', 'name', 'telp', 'api_key', 'webhook', 'webhook_group', 'expired_at', 'device_status']
+            attributes: ['device_id', 'name', 'telp', 'api_key', 'webhook', 'webhook_group', 'expired_at', 'device_status', 'user_id']
         })
 
         return device

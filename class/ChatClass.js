@@ -21,7 +21,8 @@ const chat_class = class ChatClass {
         this.create_form = null,
         this.folder_id = null,
         this.total_receiver = null,
-        this.token = null
+        this.token = null,
+        this.token_log = null
     }
 
     setUserId(user_id) { 
@@ -136,6 +137,12 @@ const chat_class = class ChatClass {
         return this
     }
 
+
+    setTokenLog(token_log) {
+        this.token_log = token_log
+        return this
+    }
+
     async formatWebhookChat() {
         try {
             var message = this.message
@@ -247,12 +254,16 @@ const chat_class = class ChatClass {
     async storeLog() {
         // var token_dev = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiUmFobWF0IiwicGFzc3dvcmQiOiJSYWhtYXQiLCJpYXQiOjE2NzA4MDY5NTl9.7_mKvfdHWQCm5VwC5hEKMw7BHZU3GKsaCD6mXcmyv9s'
         // var token_prod = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiMTIzNCIsInBhc3N3b3JkIjoiMTIzIiwiaWF0IjoxNjY4NTA2MDAzfQ.sFkDtqjJQP7cTJa0IJR66Nu0tCV4vIrru6Bqm6iCEH8'
+
+        if(this.token_log == null) {
+            this.token_log = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiMTIzNCIsInBhc3N3b3JkIjoiMTIzIiwiaWF0IjoxNjY4NTA2MDAzfQ.sFkDtqjJQP7cTJa0IJR66Nu0tCV4vIrru6Bqm6iCEH8'
+        }
         
         var options = {
             'method': 'POST',
-            'url': 'https://newsweather.angel-ping.my.id/create',
+            'url': 'http://localhost:8080/create',
             'headers': {
-                'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiMTIzNCIsInBhc3N3b3JkIjoiMTIzIiwiaWF0IjoxNjY4NTA2MDAzfQ.sFkDtqjJQP7cTJa0IJR66Nu0tCV4vIrru6Bqm6iCEH8',
+                'x-access-token': this.token_log,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(this.response)
