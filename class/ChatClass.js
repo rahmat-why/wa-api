@@ -68,6 +68,7 @@ const chat_class = class ChatClass {
 
     setRawMessage(raw_message) {
         this.raw_message = raw_message
+        return this
     }
 
     setMessage(doc /* object */) {
