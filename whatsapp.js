@@ -116,23 +116,34 @@ const createSession = async (sessionId, isLegacy = false, res = null) => {
                 .setDeviceId(sessionId)
                 .getDevice()
 
+            console.log(JSON.stringify(["sessionId 1: "+sessionId, message]))
+
             if(remote === "s.whatsapp.net"){
+
+                console.log(JSON.stringify(["sessionId 2: "+sessionId, message]))
+
                 var formatted_response_chat = 
                     await new ChatClass()
                     .setSessionId(sessionId)
                     .setMessage(message)
                     .formatWebhookChat()
 
+                console.log(JSON.stringify(["sessionId 3: "+sessionId, message]))
+
                 var get_user = 
                     await new AuthClass()
                     .setId(device.user_id)
                     .getUserById()
+
+                console.log(JSON.stringify(["sessionId 4: "+sessionId, message]))
 
                 var store_log = 
                     await new ChatClass()
                     .setResponse(formatted_response_chat)
                     .setTokenLog(get_user.token_log)
                     .storeLog()
+
+                console.log(JSON.stringify(["sessionId 5: "+sessionId, message]))
 
             }else if(remote === "g.us"){
                 var formatted_response_chat = 
