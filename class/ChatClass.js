@@ -22,7 +22,8 @@ const chat_class = class ChatClass {
         this.folder_id = null,
         this.total_receiver = null,
         this.token = null,
-        this.token_log = null
+        this.token_log = null,
+        this.raw_message = null
     }
 
     setUserId(user_id) { 
@@ -63,6 +64,10 @@ const chat_class = class ChatClass {
     setScheduleAt(schedule_at) {
         this.schedule_at = schedule_at
         return this
+    }
+
+    setRawMessage(raw_message) {
+        this.raw_message = raw_message
     }
 
     setMessage(doc /* object */) {
@@ -145,7 +150,7 @@ const chat_class = class ChatClass {
 
     async formatWebhookChat() {
         try {
-            var message = this.message
+            var message = this.raw_message
             if("sessionId" in message.key) {
                 var response = {
                     key:{
@@ -191,7 +196,7 @@ const chat_class = class ChatClass {
     }
 
     async formatWebhookGroup() {
-        var message = this.message
+        var message = this.raw_message
         
         if (message.message.extendedTextMessage !== null && message.message.extendedTextMessage !== "") {
             var response = {

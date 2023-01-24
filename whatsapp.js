@@ -125,7 +125,7 @@ const createSession = async (sessionId, isLegacy = false, res = null) => {
                 var formatted_response_chat = 
                     await new ChatClass()
                     .setSessionId(sessionId)
-                    .setMessage(message)
+                    .setRawMessage(message)
                     .formatWebhookChat()
 
                 console.log(JSON.stringify(["sessionId 3: "+sessionId, message]))
