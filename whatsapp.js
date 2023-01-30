@@ -116,11 +116,8 @@ const createSession = async (sessionId, isLegacy = false, res = null) => {
                 .setDeviceId(sessionId)
                 .getDevice()
 
-            console.log(JSON.stringify(["sessionId 1: "+sessionId, message]))
-
+            var formatted_response_chat = null
             if(remote === "s.whatsapp.net"){
-
-                console.log(JSON.stringify(["sessionId 2: "+sessionId, message]))
 
                 var formatted_response_chat = 
                     await new ChatClass()
@@ -128,22 +125,16 @@ const createSession = async (sessionId, isLegacy = false, res = null) => {
                     .setRawMessage(message)
                     .formatWebhookChat()
 
-                console.log(JSON.stringify(["sessionId 3: "+sessionId, message]))
-
                 var get_user = 
                     await new AuthClass()
                     .setId(device.user_id)
                     .getUserById()
-
-                console.log(JSON.stringify(["sessionId 4: "+sessionId, message]))
 
                 var store_log = 
                     await new ChatClass()
                     .setResponse(formatted_response_chat)
                     .setTokenLog(get_user.token_log)
                     .storeLog()
-
-                console.log(JSON.stringify(["sessionId 5: "+sessionId, message]))
 
             }else if(remote === "g.us"){
                 var formatted_response_chat = 
@@ -164,18 +155,20 @@ const createSession = async (sessionId, isLegacy = false, res = null) => {
                     .storeLog()
             }
 
+            if (device === null) {
+                return false
+            }
+
+            if (device.webhook === null) {
+                return false
+            }
+
+            if(formatted_response_chat == null) {
+                return false
+            }
+
             if (!message.key.fromMe) {
-                await delay(1000)
-
-                if (device === null) {
-                    return false
-                }
-
                 if (remote === "s.whatsapp.net") {
-                    if (device.webhook === null) {
-                        return false
-                    }
-
                     var call_webhook = 
                         await new ChatClass()
                         .setResponse(formatted_response_chat)
@@ -183,10 +176,6 @@ const createSession = async (sessionId, isLegacy = false, res = null) => {
                         .callWebhook()
                         
                 }else if(remote === "g.us"){
-                    if (device.webhook_group === null) {
-                        return false
-                    }
-
                     var call_webhook = 
                         await new ChatClass()
                         .setResponse(formatted_response_chat)
@@ -199,7 +188,20 @@ const createSession = async (sessionId, isLegacy = false, res = null) => {
                 // } else {
                 //     await wa.sendReadReceipt(message.key.remoteJid, message.key.participant, [message.key.id])
                 // }
-            }   
+            }else{
+                const keywords = 
+                    await new ConfigClass()
+                    .getEventAppend()
+                    
+                var keyword = formatted_response_chat.key.message
+                if(keywords.includes(keyword) && remote === "s.whatsapp.net") {
+                    var call_webhook = 
+                        await new ChatClass()
+                        .setResponse(formatted_response_chat)
+                        .setWebhook(device.webhook)
+                        .callWebhook()
+                }
+            }
         } catch (err) {
             let notification_error = 
                 await new ConfigClass()

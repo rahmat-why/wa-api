@@ -22,6 +22,12 @@ const config_class = class ConfigClass {
 
         return bank_account
     }
+
+    async getEventAppend() {
+        const event_append = ["#endchat", "endchat"]
+
+        return event_append
+    }
     
     async notificationError() {
         return false
