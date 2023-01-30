@@ -11,9 +11,9 @@ export async function journeyValidator(req, res, next) {
     const journey = await Journeys.findOne({journey_id: journey_id})
     if (journey) {
       if (journey.user_id === user_id) {
-        chatflow_id ??= journey.chatflow_id
-        current_state ??= journey.current_state
-        next_state ??= journey.next_state
+        chatflow_id ?? journey.chatflow_id
+        current_state ?? journey.current_state
+        next_state ?? journey.next_state
         return next()
       }
       return response(res, 403, false, "You don't have permission to access this journey")
