@@ -100,6 +100,8 @@ const createSession = async (sessionId, isLegacy = false, res = null) => {
         try{
             const message = m.messages[0]
 
+            console.log(JSON.stringify(["step 1", message]))
+
             const valid_types = ["notify", "append"]
             if(!valid_types.includes(m.type)) {
                 return false
@@ -116,54 +118,36 @@ const createSession = async (sessionId, isLegacy = false, res = null) => {
                 .setDeviceId(sessionId)
                 .getDevice()
 
-            var formatted_response_chat = null
-            if(remote === "s.whatsapp.net"){
+            console.log(JSON.stringify(["step 2", device]))
 
-                var formatted_response_chat = 
-                    await new ChatClass()
-                    .setSessionId(sessionId)
-                    .setRawMessage(message)
-                    .formatWebhookChat()
+            var formatted_response_chat = 
+                await new ChatClass()
+                .setSessionId(sessionId)
+                .setRawMessage(message)
+                .formatWebhookChat()
 
-                var get_user = 
-                    await new AuthClass()
-                    .setId(device.user_id)
-                    .getUserById()
+            console.log(JSON.stringify(["step 3", formatted_response_chat]))
 
-                var store_log = 
-                    await new ChatClass()
-                    .setResponse(formatted_response_chat)
-                    .setTokenLog(get_user.token_log)
-                    .storeLog()
+            var get_user = 
+                await new AuthClass()
+                .setId(device.user_id)
+                .getUserById()
 
-            }else if(remote === "g.us"){
-                var formatted_response_chat = 
-                    await new ChatClass()
-                    .setSessionId(sessionId)
-                    .setMessage(message)
-                    .formatWebhookGroup()
+            console.log(JSON.stringify(["step 4", get_user]))
 
-                var get_user = 
-                    await new AuthClass()
-                    .setId(device.user_id)
-                    .getUserById()
+            var store_log = 
+                await new ChatClass()
+                .setResponse(formatted_response_chat)
+                .setTokenLog(get_user.token_log)
+                .storeLog()
 
-                var store_log = 
-                    await new ChatClass()
-                    .setResponse(formatted_response_chat)
-                    .setTokenLog(get_user.token_log)
-                    .storeLog()
-            }
+            console.log(JSON.stringify(["step 5", store_log]))
 
             if (device === null) {
                 return false
             }
 
             if (device.webhook === null) {
-                return false
-            }
-
-            if(formatted_response_chat == null) {
                 return false
             }
 
