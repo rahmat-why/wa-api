@@ -135,13 +135,17 @@ const createSession = async (sessionId, isLegacy = false, res = null) => {
 
             console.log(JSON.stringify(["step 4", get_user]))
 
-            var store_log = 
-                await new ChatClass()
-                .setResponse(formatted_response_chat)
-                .setTokenLog(get_user.token_log)
-                .storeLog()
+            const null_keywords = [""]
+            var keyword = formatted_response_chat.key.message
+            if(!null_keywords.includes(keyword)) {
+                var store_log = 
+                    await new ChatClass()
+                    .setResponse(formatted_response_chat)
+                    .setTokenLog(get_user.token_log)
+                    .storeLog()
 
-            console.log(JSON.stringify(["step 5", store_log]))
+                console.log(JSON.stringify(["step 5", store_log]))
+            }
 
             if (device === null) {
                 return false
@@ -152,20 +156,11 @@ const createSession = async (sessionId, isLegacy = false, res = null) => {
             }
 
             if (!message.key.fromMe) {
-                if (remote === "s.whatsapp.net") {
-                    var call_webhook = 
-                        await new ChatClass()
-                        .setResponse(formatted_response_chat)
-                        .setWebhook(device.webhook)
-                        .callWebhook()
-                        
-                }else if(remote === "g.us"){
-                    var call_webhook = 
-                        await new ChatClass()
-                        .setResponse(formatted_response_chat)
-                        .setWebhook(device.webhook)
-                        .callWebhook()
-                }
+                var call_webhook = 
+                    await new ChatClass()
+                    .setResponse(formatted_response_chat)
+                    .setWebhook(device.webhook)
+                    .callWebhook()
 
                 // if (isLegacy) {
                 //     await wa.chatRead(message.key, 1)
@@ -178,7 +173,7 @@ const createSession = async (sessionId, isLegacy = false, res = null) => {
                     .getEventAppend()
                     
                 var keyword = formatted_response_chat.key.message
-                if(keywords.includes(keyword) && remote === "s.whatsapp.net") {
+                if(keywords.includes(keyword)) {
                     var call_webhook = 
                         await new ChatClass()
                         .setResponse(formatted_response_chat)

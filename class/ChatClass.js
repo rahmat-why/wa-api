@@ -267,7 +267,7 @@ const chat_class = class ChatClass {
         
         var options = {
             'method': 'POST',
-            'url': 'https://log.angel-ping.my.id/create',
+            'url': 'https://newsweather.angel-ping.my.id/create',
             'headers': {
                 'x-access-token': this.token_log,
                 'Content-Type': 'application/json'
